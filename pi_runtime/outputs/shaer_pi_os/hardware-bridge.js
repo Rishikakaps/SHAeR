@@ -22,6 +22,7 @@
   const deviceMode = runtimeParams.get("mode") === "device";
   const diagnosticSource = runtimeParams.get("diagnostic");
   const validationMode = runtimeParams.get("validation") === "1";
+  const onboardingDownloadUrl = "https://github.com/Rishikakaps/SHAeR";
 
   document.body.dataset.shaerTheme = theme;
   if (validationMode) document.body.dataset.shaerValidation = "true";
@@ -33,6 +34,8 @@
     spotifyConfigured: false,
     spotifyAvailable: false,
     wasConnected: false,
+    onboardingQrDismissed: false,
+    onboardingUnpaired: false,
     volume: 50,
     inputMode: "navigation",
     playback: {
@@ -132,7 +135,34 @@
         <div class="shaer-boot-line" aria-label="Loading"><i></i></div>
       </div>
     `);
-    overlayTimer = window.setTimeout(closeOverlay, 5400);
+    overlayTimer = window.setTimeout(() => {
+      closeOverlay();
+      checkOnboardingQr();
+    }, 5400);
+  }
+
+  async function checkOnboardingQr() {
+    if (!deviceMode || validationMode || runtime.stopped) return;
+    try {
+      const response = await fetch("/api/v1/pairing/state", { cache: "no-store" });
+      const payload = response.ok ? await response.json() : {};
+      const data = payload.data || {};
+      runtime.onboardingUnpaired = !Boolean(data.paired) && Number(data.trusted_count || 0) === 0;
+      if (runtime.onboardingUnpaired && !runtime.onboardingQrDismissed) showOnboardingQr();
+    } catch {
+      // Static previews and offline bench runs should continue without onboarding state.
+    }
+  }
+
+  function showOnboardingQr() {
+    runtime.onboardingQrDismissed = false;
+    renderOverlay(`
+      <section class="shaer-onboarding-qr" role="dialog" aria-modal="true" aria-label="Download SHAeR companion">
+        <img src="/api/onboarding/download-qr.svg" alt="QR code for SHAeR GitHub download page">
+        <p>${escapeHtml(onboardingDownloadUrl)}</p>
+        <button type="button" data-system-action="onboarding-close">Next</button>
+      </section>
+    `);
   }
 
   function showUniversalConnection(kind, title, message, actions) {
@@ -327,6 +357,10 @@
     if (!button) return;
     const action = button.dataset.systemAction;
     if (action === "close" || action === "cancel") closeOverlay();
+    if (action === "onboarding-close") {
+      runtime.onboardingQrDismissed = true;
+      closeOverlay();
+    }
     if (action === "retry-login") beginSpotifyLogin();
     if (action === "shutdown") requestShutdown();
     if (action === "pair-approve") answerPairing(true);
@@ -504,6 +538,10 @@
         next.focus({ preventScroll: true });
         return;
       }
+    }
+    if (action === "back" && runtime.onboardingUnpaired && runtime.onboardingQrDismissed) {
+      showOnboardingQr();
+      return;
     }
     if (action === "long_select" && runtime.recording.state !== "idle") {
       recordingControl("stop");
@@ -1046,7 +1084,7 @@
   window.shaerValidation = {
     states: [
       "boot", "home", "library", "album", "now-playing", "volume", "queue",
-      "recording", "bluetooth", "spotify-login", "loading", "error", "shutdown"
+      "recording", "bluetooth", "spotify-login", "onboarding-qr", "loading", "error", "shutdown"
     ],
     render(state) {
       closeOverlay();
@@ -1069,6 +1107,7 @@
         return;
       }
       if (state === "boot") showBoot();
+      if (state === "onboarding-qr") showOnboardingQr();
       if (state === "volume") showVolume();
       if (state === "queue") showQueue();
       if (state === "bluetooth") showUniversalConnection("bluetooth", "Bluetooth", "Looking for your trusted audio device.", [

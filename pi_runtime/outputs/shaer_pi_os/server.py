@@ -64,6 +64,7 @@ LOCAL_PLAYBACK_STATE: dict[str, object] = {
 
 UDP_DISCOVERY_PORT = 8776
 UDP_DISCOVERY_REQUEST = b"SHAER_DISCOVER_V1"
+SHAER_GITHUB_URL = "https://github.com/Rishikakaps/SHAeR"
 
 
 class UdpDiscoveryResponder:
@@ -266,9 +267,13 @@ class ShaerHandler(SimpleHTTPRequestHandler):
             self._send_marginalia_file(parsed.path)
             return
         if parsed.path.startswith("/api/v1/"):
-            if parsed.path in {"/api/v1/dashboard", "/api/v1/pairing/pending", "/api/v1/pairing/status"}:
+            if parsed.path in {"/api/v1/dashboard", "/api/v1/pairing/pending", "/api/v1/pairing/status", "/api/v1/pairing/state"}:
                 self._suppress_log = True
             self._companion_get(parsed.path, parse_qs(parsed.query))
+            return
+        if parsed.path == "/api/onboarding/download-qr.svg":
+            self._suppress_log = True
+            self._send_download_qr_svg()
             return
         if parsed.path == "/api/events":
             self._suppress_log = True
@@ -454,6 +459,13 @@ class ShaerHandler(SimpleHTTPRequestHandler):
         try:
             if path == "/api/v1/device/discovery":
                 result = self.companion.discovery(self._spotify_status())
+            elif path == "/api/v1/pairing/state":
+                devices = self.companion.pairing.trusted_devices()
+                result = self.companion.envelope({
+                    "trusted_count": len(devices),
+                    "paired": bool(devices),
+                    "download_url": SHAER_GITHUB_URL,
+                })
             elif path == "/api/v1/pairing/status":
                 result = self.companion.envelope(self.companion.pairing.status((query.get("pairing_id") or [""])[0]))
             elif path == "/api/v1/pairing/pending":
@@ -540,6 +552,35 @@ class ShaerHandler(SimpleHTTPRequestHandler):
             self.send_json(result)
         except (ApiError, ArchiveError, RecordingError, ValueError, OSError, RuntimeError) as exc:
             self._send_companion_error(exc)
+
+    def _send_download_qr_svg(self) -> None:
+        try:
+            import qrcode  # type: ignore
+            import qrcode.image.svg  # type: ignore
+
+            image = qrcode.make(
+                SHAER_GITHUB_URL,
+                image_factory=qrcode.image.svg.SvgPathImage,
+                box_size=8,
+                border=2,
+            )
+            stream = io.BytesIO()
+            image.save(stream)
+            payload = stream.getvalue()
+        except Exception:
+            payload = (
+                "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 280 280\">"
+                "<rect width=\"280\" height=\"280\" fill=\"#fff\"/>"
+                "<text x=\"140\" y=\"122\" text-anchor=\"middle\" font-family=\"Arial\" font-size=\"18\" fill=\"#111\">SHAeR</text>"
+                "<text x=\"140\" y=\"150\" text-anchor=\"middle\" font-family=\"Arial\" font-size=\"10\" fill=\"#111\">github.com/Rishikakaps/SHAeR</text>"
+                "</svg>"
+            ).encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "image/svg+xml; charset=utf-8")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Content-Length", str(len(payload)))
+        self.end_headers()
+        self.wfile.write(payload)
 
     def _companion_post(self, path: str) -> None:
         try:

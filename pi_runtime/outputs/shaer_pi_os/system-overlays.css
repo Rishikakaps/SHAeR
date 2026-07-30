@@ -61,6 +61,59 @@ body[data-base-theme="dark"] #shaer-system-layer {
   pointer-events: auto;
 }
 
+.shaer-onboarding-qr {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: 1fr auto auto 1fr;
+  justify-items: center;
+  align-items: center;
+  gap: 10px;
+  padding: 18px;
+  background: #fff;
+  color: #111;
+  pointer-events: auto;
+  font-family: Arial, Helvetica, sans-serif;
+  letter-spacing: 0;
+}
+
+.shaer-onboarding-qr img {
+  grid-row: 2;
+  width: min(62%, 188px);
+  aspect-ratio: 1;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.shaer-onboarding-qr p {
+  grid-row: 3;
+  max-width: 100%;
+  margin: 0;
+  color: #111;
+  font: 700 8px/1.3 Arial, Helvetica, sans-serif;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.shaer-onboarding-qr button {
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  min-width: 54px;
+  min-height: 24px;
+  border: 1px solid #111;
+  background: #fff;
+  color: #111;
+  font: 700 9px/1 Arial, Helvetica, sans-serif;
+  text-align: center;
+}
+
+.shaer-onboarding-qr button.is-selected,
+.shaer-onboarding-qr button:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 2px;
+}
+
 .shaer-constellation {
   position: relative;
   width: 86px;
