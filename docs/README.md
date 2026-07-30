@@ -4,6 +4,7 @@ This directory collects the GitHub-facing guide layer for SHAeR.
 
 ## Product
 
+- [For Adi: How SHAeR Was Built](for-adi.md)
 - SHAeR is a local-first music, recording, annotation, and theme-driven audio device.
 - The device runtime runs on Raspberry Pi.
 - Phone and desktop companion apps connect to SHAeR over local network pairing.

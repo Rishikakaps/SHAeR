@@ -13,6 +13,12 @@ This repository is the GitHub-ready SHAeR source tree. It includes:
 - Documentation, build guides, and verification notes
 - A download page for phone and desktop installers
 
+## For Adi
+
+Start here for the short product story: how SHAeR moved from hardware idea to Pi runtime, phone companion, desktop companion, UI direction, and release flow.
+
+[Read: How SHAeR Was Built](docs/for-adi.md)
+
 ## Downloads
 
 Open the download page:
