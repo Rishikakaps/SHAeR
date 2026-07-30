@@ -65,6 +65,7 @@ LOCAL_PLAYBACK_STATE: dict[str, object] = {
 UDP_DISCOVERY_PORT = 8776
 UDP_DISCOVERY_REQUEST = b"SHAER_DISCOVER_V1"
 SHAER_GITHUB_URL = "https://github.com/Rishikakaps/SHAeR"
+MAX_FEEDBACK_REPORTS = 200
 
 
 class UdpDiscoveryResponder:
@@ -503,6 +504,10 @@ class ShaerHandler(SimpleHTTPRequestHandler):
                     result = self.companion.export_theme(path.split("/")[4])
                 elif path == "/api/v1/diagnostics":
                     result = self.companion.diagnostics()
+                elif path == "/api/v1/feedback":
+                    result = self.companion.envelope({"reports": self._feedback_reports()})
+                elif path == "/api/v1/developer/dashboard":
+                    result = self.companion.envelope(self._developer_dashboard())
                 elif path == "/api/v1/music/tracks":
                     result = self.companion.music((query.get("q") or [""])[0])
                 elif path == "/api/v1/music/playlists":
@@ -605,6 +610,10 @@ class ShaerHandler(SimpleHTTPRequestHandler):
                     raise ApiError("theme_import_disabled", "Unsigned theme installation is disabled on this build.", 403)
                 elif path == "/api/v1/diagnostics/run":
                     result = self.companion.run_diagnostic(str(payload.get("name") or ""), bool(payload.get("hardware")))
+                elif path == "/api/v1/feedback":
+                    result = self.companion.envelope(self._create_feedback_report(payload))
+                elif path == "/api/v1/developer/releases":
+                    result = self.companion.envelope(self._create_developer_release(payload))
                 elif path == "/api/v1/music/upload":
                     result = self.companion.upload_track(str(payload.get("filename") or ""), str(payload.get("content_base64") or ""))
                 elif path == "/api/v1/branding/app-icon":
@@ -665,6 +674,83 @@ class ShaerHandler(SimpleHTTPRequestHandler):
             self.send_json(result)
         except (ApiError, ArchiveError, RecordingError, ValueError, OSError, RuntimeError, zipfile.BadZipFile) as exc:
             self._send_companion_error(exc)
+
+    def _feedback_path(self) -> Path:
+        return self.companion.config_dir / "feedback-reports.json"
+
+    def _developer_releases_path(self) -> Path:
+        return self.companion.config_dir / "developer-releases.json"
+
+    @staticmethod
+    def _load_json_list(path: Path) -> list[dict[str, object]]:
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except FileNotFoundError:
+            return []
+        except (OSError, json.JSONDecodeError):
+            return []
+        return [item for item in payload if isinstance(item, dict)] if isinstance(payload, list) else []
+
+    @staticmethod
+    def _save_json_list(path: Path, items: list[dict[str, object]]) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+        temporary = path.with_suffix(path.suffix + ".tmp")
+        temporary.write_text(json.dumps(items, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        os.replace(temporary, path)
+        path.chmod(0o600)
+
+    def _feedback_reports(self) -> list[dict[str, object]]:
+        return self._load_json_list(self._feedback_path())
+
+    def _create_feedback_report(self, payload: dict[str, object]) -> dict[str, object]:
+        message = str(payload.get("message") or "").strip()
+        if len(message) < 3:
+            raise ApiError("feedback_message_required", "Tell SHAeR what happened before sending feedback.")
+        context = payload.get("context") if isinstance(payload.get("context"), dict) else {}
+        report = {
+            "id": f"fb-{int(time.time())}-{secrets.token_hex(4)}",
+            "created_at": int(time.time()),
+            "message": message[:2000],
+            "severity": str(payload.get("severity") or "note")[:24],
+            "context": context,
+            "status": "new",
+        }
+        reports = self._feedback_reports()
+        reports.insert(0, report)
+        self._save_json_list(self._feedback_path(), reports[:MAX_FEEDBACK_REPORTS])
+        return report
+
+    def _developer_dashboard(self) -> dict[str, object]:
+        releases = self._load_json_list(self._developer_releases_path())
+        return {
+            "feedback": self._feedback_reports(),
+            "releases": releases,
+            "device": self.companion.discovery(self._spotify_status()).get("data", {}),
+            "updates": self.companion.update_status().get("data", {}),
+        }
+
+    def _create_developer_release(self, payload: dict[str, object]) -> dict[str, object]:
+        version = str(payload.get("version") or "").strip()
+        kind = str(payload.get("kind") or "app").strip()[:24]
+        title = str(payload.get("title") or "I learned something new. Ready to update?").strip()
+        notes = str(payload.get("notes") or "").strip()
+        url = str(payload.get("url") or "").strip()
+        if not version:
+            raise ApiError("release_version_required", "Version is required.")
+        release = {
+            "id": f"rel-{int(time.time())}-{secrets.token_hex(4)}",
+            "created_at": int(time.time()),
+            "version": version[:64],
+            "kind": kind,
+            "title": title[:160],
+            "notes": notes[:2000],
+            "url": url[:1000],
+            "status": "ready",
+        }
+        releases = self._load_json_list(self._developer_releases_path())
+        releases.insert(0, release)
+        self._save_json_list(self._developer_releases_path(), releases[:80])
+        return release
 
     def _recording_get(self, path: str, query: dict[str, list[str]]) -> None:
         try:

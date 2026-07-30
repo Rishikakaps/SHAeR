@@ -25,6 +25,7 @@
         <button type="button" data-view="recordings"><span>&#9679;</span>Recordings</button>
         <button type="button" data-view="themes"><span>&#9670;</span>Themes</button>
         <button type="button" data-view="settings"><span>&#9881;</span>Settings</button>
+        <button type="button" data-view="feedback"><span>&#9993;</span>Feedback</button>
         <button type="button" data-view="access"><span>&#9678;</span>Linked devices</button>
         <button type="button" data-view="diagnostics"><span>&#10003;</span>Diagnostics</button>
         <button type="button" data-view="updates"><span>&#8593;</span>Updates</button>
@@ -88,6 +89,18 @@
       <section class="view" data-page="settings">
         <div class="section-heading"><div><span class="eyebrow">DEVICE</span><h1>Settings</h1></div><span class="save-state" id="settingsState">Changes sync immediately</span></div>
         <div id="settingsForm" class="settings-groups empty-state">Pair a SHAeR to edit its settings.</div>
+      </section>
+
+      <section class="view" data-page="feedback">
+        <div class="section-heading"><div><span class="eyebrow">FEEDBACK</span><h1>Tell SHAeR something</h1></div><span class="status-pill" id="feedbackState">Ready</span></div>
+        <div class="feedback-grid">
+          <div class="panel form-panel feedback-composer">
+            <textarea id="feedbackMessage" placeholder="Bluetooth disconnected while changing playlists."></textarea>
+            <select id="feedbackSeverity" aria-label="Feedback kind"><option value="note">Note</option><option value="issue">Issue</option><option value="diagnostic">Diagnostic</option></select>
+            <button id="sendFeedback" type="button">Send with diagnostics</button>
+          </div>
+          <aside class="panel context-panel"><h2>Sent with the note</h2><pre id="feedbackContextPreview">{}</pre></aside>
+        </div>
       </section>
 
       <section class="view" data-page="access">

@@ -4,6 +4,7 @@ import {
   Archive,
   Bluetooth,
   CheckCircle2,
+  ClipboardList,
   Disc3,
   Download,
   HardDrive,
@@ -22,6 +23,7 @@ import {
   SkipBack,
   SkipForward,
   Upload,
+  Wrench,
   Wifi
 } from "lucide-react";
 import { ShaerApiClient } from "./core/api";
@@ -33,7 +35,7 @@ import { assertSupportedAudio, formatBytes, normalizeBaseUrl, sanitizeFilename }
 import "./styles/app.css";
 
 type Mode = "real" | "mock";
-type View = "dashboard" | "music" | "archive" | "recordings" | "themes" | "settings" | "access" | "diagnostics" | "updates" | "backup";
+type View = "dashboard" | "music" | "archive" | "recordings" | "themes" | "settings" | "feedback" | "access" | "diagnostics" | "updates" | "backup" | "developer";
 type TransferState = "idle" | "preparing" | "uploading" | "verifying" | "complete" | "failed";
 
 const client = new ShaerApiClient();
@@ -44,10 +46,12 @@ const views: Array<{ id: View; label: string; icon: React.ReactNode }> = [
   { id: "recordings", label: "Recordings", icon: <Mic size={18} /> },
   { id: "themes", label: "Themes", icon: <Library size={18} /> },
   { id: "settings", label: "Settings", icon: <Settings size={18} /> },
+  { id: "feedback", label: "Feedback", icon: <ClipboardList size={18} /> },
   { id: "access", label: "Linked devices", icon: <ShieldCheck size={18} /> },
   { id: "diagnostics", label: "Diagnostics", icon: <CheckCircle2 size={18} /> },
   { id: "updates", label: "Updates", icon: <Download size={18} /> },
-  { id: "backup", label: "Backup", icon: <HardDrive size={18} /> }
+  { id: "backup", label: "Backup", icon: <HardDrive size={18} /> },
+  { id: "developer", label: "Developer", icon: <Wrench size={18} /> }
 ];
 
 function getSetting(settings: any, path: string, fallback: any = "") {
@@ -82,6 +86,11 @@ function App() {
   const [themes, setThemes] = useState<any[]>([]);
   const [linkedDevices, setLinkedDevices] = useState<any[]>([]);
   const [diagnostics, setDiagnostics] = useState<any[]>([]);
+  const [feedbackReports, setFeedbackReports] = useState<any[]>([]);
+  const [developerDashboard, setDeveloperDashboard] = useState<any>(null);
+  const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [feedbackState, setFeedbackState] = useState("Ready");
+  const [releaseDraft, setReleaseDraft] = useState({ kind: "os", version: "", title: "I learned something new. Ready to update?", notes: "", url: "" });
   const [updateStatus, setUpdateStatus] = useState<any>(null);
   const [backupStatus, setBackupStatus] = useState<any>(null);
   const [musicQuery, setMusicQuery] = useState("");
@@ -150,6 +159,12 @@ function App() {
       if (view === "themes") setThemes(listOf(await client.themes(), ["themes"]));
       if (view === "access") setLinkedDevices(listOf(await client.linkedDevices(), ["devices", "companions"]));
       if (view === "diagnostics") setDiagnostics(listOf(await client.diagnostics(), ["diagnostics", "checks"]));
+      if (view === "feedback") setFeedbackReports(listOf(await client.feedback(), ["reports"]));
+      if (view === "developer") {
+        const dashboard = await client.developerDashboard();
+        setDeveloperDashboard(dashboard);
+        setFeedbackReports(listOf(dashboard, ["feedback"]));
+      }
       if (view === "updates") setUpdateStatus(await client.updateStatus());
       if (view === "backup") setBackupStatus(await client.backupStatus());
     } catch (err) {
@@ -318,8 +333,48 @@ function App() {
     setThemes([{ id: theme, name: "Active theme", description: "Rendered on SHAeR" }]);
     setLinkedDevices([{ id: "mock-device", name: "Desktop Companion", state: "trusted" }]);
     setDiagnostics([{ name: "Contract tests", status: "mock" }]);
+    setFeedbackReports([{ id: "mock-feedback", message: "Bluetooth disconnected while changing playlists.", created_at: Date.now() / 1000, context: { theme, companion_version: "desktop-mock" } }]);
+    setDeveloperDashboard({ feedback: feedbackReports, releases: [], device: mock.dashboard, updates: { state: "mock" } });
     setUpdateStatus({ state: "Idle" });
     setBackupStatus({ state: "Ready" });
+  }
+
+  function supportContext() {
+    return {
+      shaer_os_version: dashboard?.firmware_version || dashboard?.shaer_os_version || "unknown",
+      theme,
+      device_serial: dashboard?.device_id || credential?.deviceId || "unknown",
+      battery_percent: dashboard?.battery_percent ?? null,
+      storage_free: dashboard?.storage?.free ?? null,
+      spotify_connected: Boolean(dashboard?.spotify_authenticated),
+      bluetooth_connected: Boolean(bluetooth?.active_device),
+      wifi_ssid: wifi?.ssid || "unknown",
+      companion_version: "desktop-0.1.0",
+      capability_snapshot: capabilities?.capabilities || capabilities || {},
+      connection
+    };
+  }
+
+  async function sendFeedback() {
+    setFeedbackState("Sending...");
+    try {
+      await client.sendFeedback({ message: feedbackMessage, severity: "note", context: supportContext() });
+      setFeedbackMessage("");
+      setFeedbackState("Sent to SHAeR");
+      setFeedbackReports(listOf(await client.feedback(), ["reports"]));
+    } catch (err) {
+      setFeedbackState(toUserFacingError(err).whatHappened);
+    }
+  }
+
+  async function createRelease() {
+    try {
+      await client.createDeveloperRelease(releaseDraft);
+      setDeveloperDashboard(await client.developerDashboard());
+      setReleaseDraft({ kind: releaseDraft.kind, version: "", title: "A new chapter for SHAeR is ready.", notes: "", url: "" });
+    } catch (err) {
+      setError(toUserFacingError(err).whatHappened);
+    }
   }
 
   return (
@@ -356,10 +411,12 @@ function App() {
         {activeView === "recordings" && <ListView eyebrow="Personal Archive" title="Recordings" empty="Pair a SHAeR to browse recordings." items={recordings} />}
         {activeView === "themes" && <ThemesView themes={themes} activeTheme={theme} onApply={applyTheme} />}
         {activeView === "settings" && <SettingsView settingsData={settingsData} dashboard={dashboard} theme={theme} saveSetting={saveSetting} applyTheme={applyTheme} uploadAppIcon={uploadAppIcon} branding={branding} connected={connected} />}
+        {activeView === "feedback" && <FeedbackView message={feedbackMessage} setMessage={setFeedbackMessage} state={feedbackState} onSend={sendFeedback} context={supportContext()} reports={feedbackReports} />}
         {activeView === "access" && <ListView eyebrow="Security" title="Linked devices" empty="Connect to inspect companion access." items={linkedDevices} />}
         {activeView === "diagnostics" && <DiagnosticsView diagnostics={diagnostics} capabilities={capabilities} onRun={(name) => client.runDiagnostic(name).then(() => loadView("diagnostics")).catch((err) => setError(toUserFacingError(err).whatHappened))} />}
         {activeView === "updates" && <StatusView eyebrow="System" title="Firmware updates" status={updateStatus} actionLabel="Refresh update status" onAction={() => loadView("updates")} />}
         {activeView === "backup" && <StatusView eyebrow="Recovery" title="Backup & restore" status={backupStatus} actionLabel="Refresh backup status" onAction={() => loadView("backup")} />}
+        {activeView === "developer" && <DeveloperView dashboard={developerDashboard} releaseDraft={releaseDraft} setReleaseDraft={setReleaseDraft} onCreateRelease={createRelease} />}
       </section>
     </main>
   );
@@ -486,6 +543,76 @@ function StatusView({ eyebrow, title, status, actionLabel, onAction }: any) {
   return <><SectionHeading eyebrow={eyebrow} title={title} action={<button onClick={onAction}><RefreshCw size={16} />{actionLabel}</button>} /><section className="panel form-panel"><pre>{JSON.stringify(status || { state: "Connect to SHAeR to load this view." }, null, 2)}</pre></section></>;
 }
 
+function FeedbackView({ message, setMessage, state, onSend, context, reports }: any) {
+  return (
+    <>
+      <SectionHeading eyebrow="Feedback" title="Tell SHAeR Something" pill={state} />
+      <section className="feedback-grid">
+        <div className="panel form-panel feedback-composer">
+          <h2>Report an issue</h2>
+          <textarea value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Bluetooth disconnected while changing playlists." />
+          <div className="button-row"><button onClick={onSend} disabled={!message.trim()}><Upload size={16} />Send with diagnostics</button></div>
+        </div>
+        <aside className="panel context-panel">
+          <h2>Sent with the note</h2>
+          <pre>{JSON.stringify(context, null, 2)}</pre>
+        </aside>
+      </section>
+      <section className="feedback-list">
+        {reports.length ? reports.map((report: any) => <ReportCard key={report.id || report.created_at} report={report} />) : <div className="empty-state">No feedback reports yet.</div>}
+      </section>
+    </>
+  );
+}
+
+function DeveloperView({ dashboard, releaseDraft, setReleaseDraft, onCreateRelease }: any) {
+  const releases = listOf(dashboard, ["releases"]);
+  const feedback = listOf(dashboard, ["feedback"]);
+  const updateDraft = (key: string, value: string) => setReleaseDraft((draft: any) => ({ ...draft, [key]: value }));
+  return (
+    <>
+      <SectionHeading eyebrow="Developer" title="SHAeR Control Room" pill={`${feedback.length} reports`} />
+      <section className="developer-grid">
+        <div className="panel form-panel release-composer">
+          <h2>Publish an update notice</h2>
+          <div className="form-row">
+            <select value={releaseDraft.kind} onChange={(event) => updateDraft("kind", event.target.value)}>
+              <option value="os">OS update</option>
+              <option value="theme">Theme</option>
+              <option value="app">Companion app</option>
+              <option value="firmware">Firmware</option>
+            </select>
+            <input value={releaseDraft.version} onChange={(event) => updateDraft("version", event.target.value)} placeholder="Version" />
+          </div>
+          <input value={releaseDraft.title} onChange={(event) => updateDraft("title", event.target.value)} placeholder="I learned something new. Ready to update?" />
+          <textarea value={releaseDraft.notes} onChange={(event) => updateDraft("notes", event.target.value)} placeholder={"Added:\nNew theme\nFaster sync\nAudio improvements"} />
+          <input value={releaseDraft.url} onChange={(event) => updateDraft("url", event.target.value)} placeholder="GitHub Release asset URL" />
+          <div className="button-row"><button onClick={onCreateRelease} disabled={!releaseDraft.version.trim()}><Download size={16} />Create update notice</button></div>
+        </div>
+        <div className="developer-column">
+          <section className="panel release-list">
+            <h2>Ready for Okayy + Sync</h2>
+            {releases.length ? releases.map((release: any) => <article className="release-card" key={release.id}><strong>{release.title}</strong><small>{release.kind} {release.version}</small><p>{release.notes || "No notes added."}</p><button disabled>Okayy + Sync</button></article>) : <div className="empty-state">No update notices published.</div>}
+          </section>
+          <section className="panel release-list">
+            <h2>Feedback inbox</h2>
+            {feedback.length ? feedback.map((report: any) => <ReportCard key={report.id || report.created_at} report={report} />) : <div className="empty-state">No reports received.</div>}
+          </section>
+        </div>
+      </section>
+    </>
+  );
+}
+
+function ReportCard({ report }: any) {
+  return (
+    <article className="report-card">
+      <div><strong>{report.message || "Untitled report"}</strong><small>{report.severity || "note"} · {formatDate(report.created_at)}</small></div>
+      <pre>{JSON.stringify(report.context || {}, null, 2)}</pre>
+    </article>
+  );
+}
+
 function ListView({ eyebrow, title, empty, items }: any) {
   return <><SectionHeading eyebrow={eyebrow} title={title} /><div className="recording-list">{items.length ? items.map((item: any) => <article className="recording-item" key={item.id || item.name || item.title}><div className="recording-icon"><Rewind size={16} /></div><div className="recording-copy"><strong>{item.title || item.name || item.id}</strong><small>{item.summary || item.created_at || item.state || "Stored on SHAeR"}</small></div></article>) : <div className="empty-state">{empty}</div>}</div></>;
 }
@@ -500,6 +627,11 @@ function Metric({ label, value, detail }: { label: string; value: string; detail
 
 function DevicePane({ icon, title, lines, items }: { icon: React.ReactNode; title: string; lines: string[]; items: string[] }) {
   return <div><h3>{icon}{title}</h3>{lines.map((line) => <p key={line}>{line}</p>)}<ul>{items.map((item) => <li key={item}>{item}</li>)}</ul></div>;
+}
+
+function formatDate(seconds: number) {
+  if (!seconds) return "just now";
+  return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(Number(seconds) * 1000));
 }
 
 function Setting({ label, value, type = "text", onSave }: { label: string; value: string; type?: string; onSave: (value: string) => void }) {

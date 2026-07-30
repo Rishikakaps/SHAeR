@@ -19,6 +19,7 @@ from server import ShaerHandler  # noqa: E402
 class FakeCompanion:
     def __init__(self):
         self.pairing = self
+        self.config_dir = Path(tempfile.mkdtemp(prefix="shaer-test-companion-"))
         self.track = {
             "id": 7,
             "filepath": "/music/raag.flac",
@@ -51,6 +52,16 @@ class FakeCompanion:
                 "connectivity": {"state": "supported"},
             }
         })
+
+    def discovery(self, spotify_status=None):
+        return self.envelope({
+            "device_name": "SHAeR Test",
+            "firmware_version": "0.19.0",
+            "spotify_authenticated": bool((spotify_status or {}).get("authenticated")),
+        })
+
+    def update_status(self):
+        return self.envelope({"state": "idle"})
 
     def authenticate(self, _token):
         return {"device_id": "test-companion"}
@@ -250,6 +261,44 @@ class DeviceRouteTests(unittest.TestCase):
         self.assertFalse(payload["data"]["paired"])
         self.assertEqual(payload["data"]["trusted_count"], 0)
         self.assertEqual(payload["data"]["download_url"], "https://github.com/Rishikakaps/SHAeR")
+
+    def test_feedback_report_stores_context_for_developer_dashboard(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.companion.config_dir = Path(tmp)
+            status, payload = self.post("/api/v1/feedback", {
+                "message": "Bluetooth disconnected while changing playlists.",
+                "severity": "issue",
+                "context": {
+                    "shaer_os_version": "0.19.0",
+                    "theme": "itunes_pink",
+                    "battery_percent": 72,
+                    "spotify_connected": True,
+                },
+            })
+            self.assertEqual(status, 200)
+            self.assertEqual(payload["data"]["severity"], "issue")
+
+            status, dashboard = self.get("/api/v1/developer/dashboard")
+            self.assertEqual(status, 200)
+            self.assertEqual(dashboard["data"]["feedback"][0]["message"], "Bluetooth disconnected while changing playlists.")
+            self.assertEqual(dashboard["data"]["feedback"][0]["context"]["theme"], "itunes_pink")
+
+    def test_developer_release_notice_stores_update_metadata(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.companion.config_dir = Path(tmp)
+            status, payload = self.post("/api/v1/developer/releases", {
+                "kind": "theme",
+                "version": "1.1.0",
+                "title": "A new chapter for SHAeR is ready.",
+                "notes": "Added a pink iMusic selection state.",
+                "url": "https://github.com/Rishikakaps/SHAeR/releases/tag/v1.1.0",
+            })
+            self.assertEqual(status, 200)
+            self.assertEqual(payload["data"]["kind"], "theme")
+
+            status, dashboard = self.get("/api/v1/developer/dashboard")
+            self.assertEqual(status, 200)
+            self.assertEqual(dashboard["data"]["releases"][0]["version"], "1.1.0")
 
 
 if __name__ == "__main__":

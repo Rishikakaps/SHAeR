@@ -79,9 +79,11 @@ export class ShaerApiClient {
   playlists() { return this.request<any>("/api/v1/music/playlists"); }
   recordings() { return this.request<any>("/api/v1/recordings"); }
   archive() { return this.request<any>("/api/v1/archive"); }
-  linkedDevices() { return this.request<any>("/api/v1/pairing/devices"); }
+  linkedDevices() { return this.request<any>("/api/v1/pairing/trusted"); }
   diagnostics() { return this.request<any>("/api/v1/diagnostics"); }
-  updateStatus() { return this.request<any>("/api/v1/update/status"); }
+  feedback() { return this.request<any>("/api/v1/feedback"); }
+  developerDashboard() { return this.request<any>("/api/v1/developer/dashboard"); }
+  updateStatus() { return this.request<any>("/api/v1/updates/status"); }
   backupStatus() { return this.request<any>("/api/v1/backup/status"); }
   branding() { return this.request<any>("/api/v1/branding"); }
 
@@ -109,12 +111,20 @@ export class ShaerApiClient {
     return this.request<any>("/api/v1/diagnostics/run", { method: "POST", body: { name } as any });
   }
 
+  sendFeedback(payload: Record<string, unknown>) {
+    return this.request<any>("/api/v1/feedback", { method: "POST", body: payload as any });
+  }
+
+  createDeveloperRelease(payload: Record<string, unknown>) {
+    return this.request<any>("/api/v1/developer/releases", { method: "POST", body: payload as any });
+  }
+
   createBackup(payload: Record<string, unknown>) {
     return this.request<any>("/api/v1/backup/create", { method: "POST", body: payload as any });
   }
 
   stageUpdate(payload: Record<string, unknown>) {
-    return this.request<any>("/api/v1/update/stage", { method: "POST", body: payload as any });
+    return this.request<any>("/api/v1/updates/stage", { method: "POST", body: payload as any });
   }
 
   startPairing(deviceName: string) {
