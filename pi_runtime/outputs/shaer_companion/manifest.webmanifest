@@ -1,0 +1,17 @@
+{
+  "name": "SHAeR Companion",
+  "short_name": "SHAeR",
+  "description": "Secure local companion for the SHAeR music and archive device.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0c1010",
+  "theme_color": "#141718",
+  "orientation": "any",
+  "categories": ["music", "utilities"],
+  "icons": [
+    { "src": "icons/shaer-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/shaer-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

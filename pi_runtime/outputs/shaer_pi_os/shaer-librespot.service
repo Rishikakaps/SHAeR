@@ -1,0 +1,17 @@
+[Unit]
+Description=SHAeR Spotify Connect receiver
+After=network-online.target sound.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=aditya
+EnvironmentFile=-/home/aditya/.config/shaer/spotify.env
+ExecStart=/usr/local/bin/librespot --name SHAeR --backend alsa --device ${SHAER_ALSA_DEVICE} --cache /home/aditya/.cache/shaer/librespot --bitrate 320
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

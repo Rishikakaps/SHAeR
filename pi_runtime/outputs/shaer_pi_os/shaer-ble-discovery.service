@@ -1,0 +1,14 @@
+[Unit]
+Description=SHAeR Bluetooth companion discovery
+After=bluetooth.service network-online.target shaer-pi-os.service
+Wants=bluetooth.service network-online.target
+
+[Service]
+Type=simple
+User=aditya
+ExecStart=/usr/bin/python3 /home/aditya/shaer/outputs/shaer_pi_os/shaer_ble_discovery.py --port 8775
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

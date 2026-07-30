@@ -1,0 +1,14 @@
+{
+  "theme_api": 1,
+  "id": "windows_xp",
+  "display_name": "Windows XP",
+  "palette": {
+    "background": "#1448aa",
+    "accent": "#68bc56",
+    "secondary": "#dbe9ff"
+  },
+  "motion": {
+    "default_fps": 30,
+    "power_cost": "medium"
+  }
+}

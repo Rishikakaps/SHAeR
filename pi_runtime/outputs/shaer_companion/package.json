@@ -1,0 +1,26 @@
+{
+  "name": "shaer-companion",
+  "version": "0.19.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared browser, Android, and Windows PWA companion for SHAeR.",
+  "scripts": {
+    "test": "node --test tests-js/*.test.mjs",
+    "build:web": "node tools/build-web.mjs",
+    "package:pwa": "npm run build:web && node tools/package-pwa.mjs",
+    "android:add": "npm run build:web && cap add android",
+    "android:sync": "npm run build:web && node tools/sync-android.mjs",
+    "android:apk": "npm run android:sync && node tools/package-android.mjs",
+    "release": "npm test && npm run package:pwa && npm run android:apk"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.4.2",
+    "@capacitor/core": "8.4.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.4.2"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

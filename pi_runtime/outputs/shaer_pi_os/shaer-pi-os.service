@@ -1,0 +1,17 @@
+[Unit]
+Description=SHAeR Pi OS UI
+After=network-online.target shaer-librespot.service
+Wants=network-online.target shaer-librespot.service
+
+[Service]
+WorkingDirectory=/home/aditya/shaer/outputs
+EnvironmentFile=-/home/aditya/.config/shaer/spotify.env
+EnvironmentFile=-/home/aditya/.config/shaer/recording.env
+ExecStart=/usr/bin/python3 /home/aditya/shaer/outputs/shaer_pi_os/server.py --host 0.0.0.0 --port 8775 --theme auto --gpio --pin-a 17 --pin-b 27 --pin-ok 22 --pin-back 23 --allow-power
+TimeoutStopSec=15
+Restart=always
+RestartSec=2
+User=aditya
+
+[Install]
+WantedBy=multi-user.target

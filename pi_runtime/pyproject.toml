@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "shaer-device-os"
+version = "0.16.0"
+description = "SHAeR Raspberry Pi device OS services and protocol"
+requires-python = ">=3.10"
+
+[project.optional-dependencies]
+test = ["pytest>=8.0"]
+
+[tool.setuptools]
+packages = ["shaer_music", "shaer_recording", "shaer_companion", "shaer_hal"]
+package-dir = {shaer_music = "outputs/shaer_backend/shaer_music", shaer_recording = "outputs/shaer_backend/shaer_recording", shaer_companion = "outputs/shaer_companion", shaer_hal = "outputs/shaer_backend/shaer_hal"}
+
+[tool.pytest.ini_options]
+testpaths = ["outputs/shaer_backend/tests", "outputs/shaer_companion/tests"]
+pythonpath = ["outputs", "outputs/shaer_backend", "outputs/shaer_pi_os"]
+python_files = ["test_*.py"]
+norecursedirs = ["diagnostics", "artifacts", ".git", "__pycache__"]
+addopts = "--strict-markers"

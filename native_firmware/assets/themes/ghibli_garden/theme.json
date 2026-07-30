@@ -1,0 +1,14 @@
+{
+  "theme_api": 1,
+  "id": "ghibli_garden",
+  "display_name": "Ghibli Garden",
+  "palette": {
+    "background": "#304630",
+    "accent": "#d2b26b",
+    "secondary": "#e7efd9"
+  },
+  "motion": {
+    "default_fps": 24,
+    "power_cost": "low"
+  }
+}

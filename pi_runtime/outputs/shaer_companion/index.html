@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#141718">
+  <title>SHAeR Companion</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/shaer-192.png">
+  <link rel="stylesheet" href="src/companion.css?v=20260721">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <button class="brand" type="button" data-view="dashboard" aria-label="Open device dashboard"><img id="brandIcon" alt="" hidden>SHAeR</button>
+      <div class="connection"><i id="connectionDot"></i><span id="connectionLabel">Finding device</span></div>
+      <button class="icon-button" id="refreshButton" type="button" title="Refresh device" aria-label="Refresh device">&#8635;</button>
+    </header>
+
+    <aside class="sidebar" aria-label="Companion sections">
+      <nav id="navigation">
+        <button class="active" type="button" data-view="dashboard"><span>&#9632;</span>Device</button>
+        <button type="button" data-view="music"><span>&#9835;</span>Music</button>
+        <button type="button" data-view="archive"><span>&#10022;</span>Marginalia</button>
+        <button type="button" data-view="recordings"><span>&#9679;</span>Recordings</button>
+        <button type="button" data-view="themes"><span>&#9670;</span>Themes</button>
+        <button type="button" data-view="settings"><span>&#9881;</span>Settings</button>
+        <button type="button" data-view="access"><span>&#9678;</span>Linked devices</button>
+        <button type="button" data-view="diagnostics"><span>&#10003;</span>Diagnostics</button>
+        <button type="button" data-view="updates"><span>&#8593;</span>Updates</button>
+        <button type="button" data-view="backup"><span>&#9635;</span>Backup</button>
+      </nav>
+      <div class="device-mini">
+        <strong id="miniDevice">SHAeR</strong>
+        <span id="miniFirmware">Not paired</span>
+      </div>
+    </aside>
+
+    <main id="mainContent">
+      <div class="app-state" id="appState" data-state="connecting"><strong>Connecting</strong><span>Looking for SHAeR on your local network.</span></div>
+      <section class="view active" data-page="dashboard">
+        <div class="section-heading"><div><span class="eyebrow">DEVICE</span><h1>Overview</h1></div><span class="status-pill" id="spotifyStatus">Spotify unknown</span></div>
+        <div class="now-playing panel">
+          <div class="artwork" id="albumArtwork" aria-label="Album artwork"><span>SHAeR</span></div>
+          <div class="track-copy"><span class="eyebrow" id="playbackSource">IDLE</span><h2 id="trackTitle">Nothing playing</h2><p id="trackArtist">Choose music on SHAeR</p><div class="playback-actions"><button type="button" data-control="previous" title="Previous" aria-label="Previous track">&#9664;</button><button class="primary-control" type="button" data-control="play_pause" title="Play or pause" aria-label="Play or pause">&#9654;</button><button type="button" data-control="next" title="Next" aria-label="Next track">&#9654;</button><button type="button" data-control="volume_down" title="Volume down" aria-label="Volume down">&#8722;</button><button type="button" data-control="volume_up" title="Volume up" aria-label="Volume up">&#43;</button></div></div>
+        </div>
+        <div class="metric-grid">
+          <article class="metric"><span>Battery</span><strong id="batteryMetric">Unavailable</strong><small id="chargingMetric">Hardware pending</small></article>
+          <article class="metric"><span>Storage</span><strong id="storageMetric">--</strong><small id="storageDetail">Waiting for device</small></article>
+          <article class="metric"><span>Theme</span><strong id="themeMetric">--</strong><small>Rendered on SHAeR</small></article>
+          <article class="metric"><span>System</span><strong id="temperatureMetric">--</strong><small id="uptimeMetric">Uptime --</small></article>
+        </div>
+      </section>
+
+      <section class="view" data-page="music">
+        <div class="section-heading"><div><span class="eyebrow">LIBRARY</span><h1>Music</h1></div><label class="file-action" for="musicUpload">Add music<input id="musicUpload" type="file" accept="audio/*,.mp3,.flac,.wav,.aac,.ogg,.m4a" multiple></label></div>
+        <div class="segmented" role="tablist" aria-label="Music source"><button class="active" type="button" role="tab" aria-selected="true" aria-controls="localMusicPane" data-music-source="local">On SHAeR</button><button type="button" role="tab" aria-selected="false" aria-controls="spotifyMusicPane" data-music-source="spotify">Spotify</button></div>
+        <div id="localMusicPane" class="music-pane active" role="tabpanel">
+          <div class="toolbar"><input id="musicSearch" type="search" placeholder="Search tracks, artists, albums"><button id="newPlaylist" type="button">New playlist</button></div>
+          <div class="split-layout"><div class="panel table-panel"><div class="table-header"><span>Track</span><span>Album</span><span>Length</span><span></span></div><div id="trackList" class="data-list empty-state">Pair a SHAeR to browse its library.</div></div><aside class="panel playlist-panel"><h2>Playlists</h2><div id="playlistList" class="data-list empty-state">No playlists loaded.</div></aside></div>
+        </div>
+        <div id="spotifyMusicPane" class="music-pane" role="tabpanel">
+          <div class="spotify-header"><div><strong id="spotifyLibraryState">Checking Spotify</strong><small id="spotifyLibraryDetail">Real account data will appear after authentication.</small></div><button id="spotifyRefresh" type="button">Refresh</button></div>
+          <div class="toolbar"><input id="spotifySearch" type="search" autocomplete="off" placeholder="Search Spotify"><span class="search-hint">Search pauses while you type</span></div>
+          <div class="segmented compact" role="tablist" aria-label="Spotify collection"><button class="active" type="button" role="tab" aria-selected="true" data-spotify-view="saved">Saved</button><button type="button" role="tab" aria-selected="false" data-spotify-view="playlists">Playlists</button><button type="button" role="tab" aria-selected="false" data-spotify-view="recent">Recent</button><button type="button" role="tab" aria-selected="false" data-spotify-view="queue">Queue</button><button type="button" role="tab" aria-selected="false" data-spotify-view="search">Search</button></div>
+          <div id="spotifyCollection" class="spotify-collection empty-state">Connect to load Spotify.</div>
+          <button id="spotifyLoadMore" class="secondary load-more" type="button" hidden>Load more</button>
+        </div>
+      </section>
+
+      <section class="view" data-page="themes">
+        <div class="section-heading"><div><span class="eyebrow">APPEARANCE</span><h1>Themes</h1></div></div>
+        <div id="themeGrid" class="theme-grid empty-state">Pair a SHAeR to manage themes.</div>
+      </section>
+
+      <section class="view" data-page="recordings">
+        <div class="section-heading"><div><span class="eyebrow">PERSONAL ARCHIVE</span><h1>Recordings</h1></div><span class="status-pill" id="recordingStorage">--</span></div>
+        <div class="toolbar recording-toolbar"><input id="recordingSearch" type="search" placeholder="Search title or date"><select id="recordingFilter" aria-label="Recording filter"><option value="recent">Recent</option><option value="favorite">Favorites</option></select><input id="recordingMonth" type="month" aria-label="Recording month"></div>
+        <div id="recordingList" class="recording-list empty-state">Pair a SHAeR to browse its recording archive.</div>
+      </section>
+
+      <section class="view" data-page="archive">
+        <div class="section-heading"><div><span class="eyebrow">MUSICAL MEMORY</span><h1>Marginalia</h1></div><span class="status-pill">Local archive</span></div>
+        <p class="section-note">Handwritten pages stay on SHAeR with the musical memory they belong to.</p>
+        <div id="archiveList" class="recording-list empty-state">Pair a SHAeR to browse its archive.</div>
+      </section>
+
+      <section class="view" data-page="settings">
+        <div class="section-heading"><div><span class="eyebrow">DEVICE</span><h1>Settings</h1></div><span class="save-state" id="settingsState">Changes sync immediately</span></div>
+        <div id="settingsForm" class="settings-groups empty-state">Pair a SHAeR to edit its settings.</div>
+      </section>
+
+      <section class="view" data-page="access">
+        <div class="section-heading"><div><span class="eyebrow">SECURITY</span><h1>Linked devices</h1></div><button id="pairAnotherDevice" type="button">Pair another</button></div>
+        <p class="section-note">Only devices approved with SHAeR's physical OK button receive access. Revocation takes effect immediately.</p>
+        <div id="linkedDeviceList" class="linked-device-list empty-state">Connect to inspect companion access.</div>
+      </section>
+
+      <section class="view" data-page="diagnostics">
+        <div class="section-heading"><div><span class="eyebrow">HEALTH</span><h1>Diagnostics</h1></div><button id="runAllDiagnostics" type="button">Run contract tests</button></div>
+        <div id="diagnosticList" class="diagnostic-list empty-state">Pair a SHAeR to inspect diagnostics.</div>
+        <pre id="diagnosticOutput" class="terminal-output" hidden></pre>
+      </section>
+
+      <section class="view" data-page="updates">
+        <div class="section-heading"><div><span class="eyebrow">SYSTEM</span><h1>Firmware updates</h1></div><span class="status-pill" id="updateState">Idle</span></div>
+        <div class="panel form-panel"><h2>Stage a signed update</h2><p>Packages are verified on SHAeR before the privileged installer can apply them.</p><div class="form-row"><input id="updateVersion" placeholder="Version, e.g. 0.15.0"><input id="updateChecksum" placeholder="SHA-256 checksum"></div><label class="file-action">Choose update<input id="updatePackage" type="file"></label><label class="checkbox-row"><input id="developmentUnsigned" type="checkbox">Development package without signature</label><div class="button-row"><button id="stageUpdate" type="button">Verify and stage</button><button id="installUpdate" class="danger" type="button">Install and reboot</button></div></div>
+      </section>
+
+      <section class="view" data-page="backup">
+        <div class="section-heading"><div><span class="eyebrow">RECOVERY</span><h1>Backup &amp; restore</h1></div></div>
+        <div class="backup-grid"><div class="panel form-panel"><h2>Create encrypted backup</h2><input id="backupPassphrase" type="password" minlength="8" placeholder="Passphrase (8+ characters)"><div class="check-grid"><label><input type="checkbox" name="backupInclude" value="settings" checked>Settings</label><label><input type="checkbox" name="backupInclude" value="library" checked>Library, playlists &amp; history</label><label><input type="checkbox" name="backupInclude" value="recordings" checked>Voice recordings</label><label><input type="checkbox" name="backupInclude" value="themes" checked>Themes</label><label><input type="checkbox" name="backupInclude" value="artwork" checked>Cached artwork</label><label><input type="checkbox" name="backupInclude" value="music">Music files</label></div><button id="createBackup" type="button">Create backup</button></div><div class="panel form-panel"><h2>Restore selectively</h2><input id="restorePassphrase" type="password" minlength="8" placeholder="Backup passphrase"><input id="restoreFile" type="file" accept=".shaer-backup"><div class="check-grid"><label><input type="checkbox" name="restoreInclude" value="settings" checked>Settings</label><label><input type="checkbox" name="restoreInclude" value="library" checked>Library, playlists &amp; history</label><label><input type="checkbox" name="restoreInclude" value="recordings" checked>Voice recordings</label><label><input type="checkbox" name="restoreInclude" value="themes" checked>Themes</label><label><input type="checkbox" name="restoreInclude" value="artwork" checked>Cached artwork</label><label><input type="checkbox" name="restoreInclude" value="music">Music files</label></div><button id="restoreBackup" class="danger" type="button">Restore selected data</button></div></div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="pairingDialog">
+    <form method="dialog" class="pairing-card">
+      <span class="eyebrow">SECURE PAIRING</span><h2>Connect to SHAeR</h2><p id="pairingMessage">Confirm the request on the physical device using its OK button.</p><div class="pairing-code" id="pairingCode">------</div><input id="companionName" value="My companion" maxlength="48" aria-label="Companion name"><div class="button-row"><button id="startPairing" value="none" type="button">Request pairing</button><button value="cancel" class="secondary" type="submit">Later</button></div>
+    </form>
+  </dialog>
+  <dialog id="deviceDialog">
+    <form method="dialog" class="pairing-card">
+      <span class="eyebrow">NEARBY DEVICE</span><h2>Find SHAeR</h2><p>Keep SHAeR nearby with Bluetooth on. The app will find it and connect securely over your local network.</p>
+      <div id="discoveredDevices" class="discovered-devices empty-state">Searching nearby over Bluetooth...</div>
+      <label class="field-label" for="manualDeviceAddress">Network address fallback</label><input id="manualDeviceAddress" inputmode="url" placeholder="shaer.local:8775" autocomplete="url">
+      <div class="button-row"><button id="connectManual" value="none" type="button">Connect</button><button value="cancel" class="secondary" type="submit">Cancel</button></div>
+    </form>
+  </dialog>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="src/companion.js?v=20260721"></script>
+</body>
+</html>

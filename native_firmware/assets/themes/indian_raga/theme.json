@@ -1,0 +1,14 @@
+{
+  "theme_api": 1,
+  "id": "indian_raga",
+  "display_name": "Indian Raga",
+  "palette": {
+    "background": "#0a1046",
+    "accent": "#b55c30",
+    "secondary": "#b09ad6"
+  },
+  "motion": {
+    "default_fps": 24,
+    "power_cost": "medium"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "theme_api": 1,
+  "id": "archive_dark",
+  "display_name": "Archive Dark",
+  "palette": {
+    "background": "#060c12",
+    "accent": "#00dc96",
+    "secondary": "#9fb8b1"
+  },
+  "motion": {
+    "default_fps": 30,
+    "power_cost": "medium"
+  }
+}

@@ -1,0 +1,16 @@
+.DS_Store
+node_modules/
+dist/
+build/
+target/
+__pycache__/
+*.pyc
+.gradle/
+apps/desktop/src-tauri/target/
+apps/desktop/dist/
+apps/desktop/node_modules/
+native_firmware/build/
+pi_runtime/outputs/shaer_companion/node_modules/
+pi_runtime/outputs/shaer_companion/android/.gradle/
+pi_runtime/outputs/shaer_companion/android/app/build/
+pi_runtime/outputs/shaer_companion/android/capacitor-cordova-android-plugins/build/

@@ -1,0 +1,49 @@
+# Build outputs
+build/*
+!build/.gitkeep
+build_cmake/
+*.o
+*.a
+*.so
+*.dylib
+*.exe
+
+# Release/package outputs
+releases/*
+!releases/.gitkeep
+*.zip
+*.tar.gz
+
+# Runtime data
+logs/*
+!logs/.gitkeep
+data/
+cache/
+run/*.pid
+.companion_data/
+work/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Databases generated locally
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+
+# OS/editor files
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Secrets
+.env
+*.secret
+spotify_credentials.json
+wifi_credentials.json

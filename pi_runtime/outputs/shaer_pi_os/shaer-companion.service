@@ -1,0 +1,11 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+<service-group>
+  <name replace-wildcards="yes">SHAeR on %h</name>
+  <service>
+    <type>_shaer._tcp</type>
+    <port>8775</port>
+    <txt-record>protocol=1</txt-record>
+    <txt-record>path=/companion</txt-record>
+  </service>
+</service-group>

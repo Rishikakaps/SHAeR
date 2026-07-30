@@ -1,0 +1,33 @@
+{
+  "updatedAt": "2026-07-30T06:08:38.868Z",
+  "source": "assets/branding/app-icon-source.png",
+  "generatedTargets": [
+    "apps/desktop/src-tauri/icons/icon.png",
+    "apps/desktop/src-tauri/icons/32x32.png",
+    "apps/desktop/src-tauri/icons/128x128.png",
+    "apps/desktop/src-tauri/icons/128x128@2x.png",
+    "pi_runtime/outputs/shaer_companion/icons/shaer-192.png",
+    "pi_runtime/outputs/shaer_companion/icons/shaer-512.png",
+    "pi_runtime/outputs/shaer_companion/dist/icons/shaer-192.png",
+    "pi_runtime/outputs/shaer_companion/dist/icons/shaer-512.png",
+    "pi_runtime/outputs/shaer_companion/android/app/src/main/assets/public/icons/shaer-192.png",
+    "pi_runtime/outputs/shaer_companion/android/app/src/main/assets/public/icons/shaer-512.png",
+    "pi_runtime/outputs/shaer_companion/android/app/src/main/res/mipmap-mdpi/ic_launcher.png",
+    "pi_runtime/outputs/shaer_companion/android/app/src/main/res/mipmap-hdpi/ic_launcher.png",
+    "pi_runtime/outputs/shaer_companion/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png",
+    "pi_runtime/outputs/shaer_companion/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png",
+    "pi_runtime/outputs/shaer_companion/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+    "pi_runtime/outputs/shaer_companion/android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png",
+    "pi_runtime/outputs/shaer_companion/android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png",
+    "pi_runtime/outputs/shaer_companion/android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png",
+    "pi_runtime/outputs/shaer_companion/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png",
+    "pi_runtime/outputs/shaer_companion/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png",
+    "pi_runtime/outputs/shaer_companion/android/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png",
+    "pi_runtime/outputs/shaer_companion/android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png",
+    "pi_runtime/outputs/shaer_companion/android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png",
+    "pi_runtime/outputs/shaer_companion/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png",
+    "pi_runtime/outputs/shaer_companion/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png",
+    "apps/desktop/src-tauri/icons/icon.icns",
+    "apps/desktop/src-tauri/icons/icon.ico"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "theme_api": 1,
+  "id": "bombay_ticket",
+  "display_name": "Bombay Ticket",
+  "palette": {
+    "background": "#2a1f16",
+    "accent": "#ce442c",
+    "secondary": "#e8c07a"
+  },
+  "motion": {
+    "default_fps": 24,
+    "power_cost": "medium"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "appId": "in.shaer.companion",
+  "appName": "SHAeR Companion",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "http",
+    "hostname": "localhost",
+    "cleartext": true
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "shaer-desktop-preview",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "node desktop_preview/server.js",
+    "build": "make -C native_firmware preview",
+    "test": "npm run build && node desktop_preview/test_backend.js"
+  }
+}

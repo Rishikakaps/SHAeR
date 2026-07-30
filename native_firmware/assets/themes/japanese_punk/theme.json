@@ -1,0 +1,14 @@
+{
+  "theme_api": 1,
+  "id": "japanese_punk",
+  "display_name": "Japanese Punk",
+  "palette": {
+    "background": "#121218",
+    "accent": "#ed2a70",
+    "secondary": "#f6f1d8"
+  },
+  "motion": {
+    "default_fps": 30,
+    "power_cost": "high"
+  }
+}
