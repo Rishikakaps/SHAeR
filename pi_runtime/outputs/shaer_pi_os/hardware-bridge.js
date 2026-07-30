@@ -23,6 +23,11 @@
   const diagnosticSource = runtimeParams.get("diagnostic");
   const validationMode = runtimeParams.get("validation") === "1";
   const onboardingDownloadUrl = "https://github.com/Rishikakaps/SHAeR";
+  const INPUT_MODE_NAVIGATION = "navigation";
+  const INPUT_MODE_VOLUME = "volume";
+  const OK_DOUBLE_PRESS_MS = 400;
+  const VOLUME_IDLE_TIMEOUT_MS = 3000;
+  const VOLUME_STEP_PERCENT = 3;
 
   document.body.dataset.shaerTheme = theme;
   if (validationMode) document.body.dataset.shaerValidation = "true";
@@ -37,7 +42,12 @@
     onboardingQrDismissed: false,
     onboardingUnpaired: false,
     volume: 50,
-    inputMode: "navigation",
+    inputMode: INPUT_MODE_NAVIGATION,
+    pendingOkTimer: 0,
+    lastOkPressAt: 0,
+    suppressOkUntil: 0,
+    volumeIdleTimer: 0,
+    volumePersistTimer: 0,
     playback: {
       title: "",
       artist: "",
@@ -96,6 +106,7 @@
     systemLayer.setAttribute("aria-live", "polite");
     host.appendChild(systemLayer);
     systemLayer.addEventListener("click", handleSystemAction);
+    setInputMode(INPUT_MODE_NAVIGATION, "boot");
     if (deviceMode && !window.sessionStorage.getItem("shaer-boot-shown")) {
       window.sessionStorage.setItem("shaer-boot-shown", "1");
       showBoot();
@@ -112,6 +123,53 @@
       firstAction.classList.add("is-selected");
       firstAction.focus({ preventScroll: true });
     }
+  }
+
+  function setInputMode(mode, reason = "runtime") {
+    const nextMode = mode === INPUT_MODE_VOLUME ? INPUT_MODE_VOLUME : INPUT_MODE_NAVIGATION;
+    if (runtime.inputMode === nextMode && reason !== "volume-activity") return;
+    runtime.inputMode = nextMode;
+    document.body.dataset.shaerInputMode = runtime.inputMode;
+    renderInputModeBadge();
+    window.dispatchEvent(new CustomEvent("shaer:input-mode", { detail: { mode: runtime.inputMode, reason } }));
+    if (runtime.inputMode === INPUT_MODE_VOLUME) scheduleVolumeModeTimeout();
+    else {
+      window.clearTimeout(runtime.volumeIdleTimer);
+      runtime.volumeIdleTimer = 0;
+    }
+  }
+
+  function enterVolumeMode(reason = "double-ok") {
+    setInputMode(INPUT_MODE_VOLUME, reason);
+    showVolume();
+  }
+
+  function exitVolumeMode(reason = "exit") {
+    if (runtime.inputMode !== INPUT_MODE_VOLUME) return false;
+    setInputMode(INPUT_MODE_NAVIGATION, reason);
+    if (systemLayer && systemLayer.querySelector('[data-popup-kind="volume"]')) closeOverlay();
+    return true;
+  }
+
+  function scheduleVolumeModeTimeout() {
+    window.clearTimeout(runtime.volumeIdleTimer);
+    runtime.volumeIdleTimer = window.setTimeout(() => exitVolumeMode("idle-timeout"), VOLUME_IDLE_TIMEOUT_MS);
+  }
+
+  function renderInputModeBadge() {
+    let badge = document.querySelector(".shaer-input-mode-badge");
+    if (runtime.inputMode !== INPUT_MODE_VOLUME) {
+      if (badge) badge.remove();
+      return;
+    }
+    if (!badge) {
+      badge = document.createElement("div");
+      badge.className = "shaer-input-mode-badge";
+      badge.setAttribute("role", "status");
+      badge.setAttribute("aria-label", "Volume mode active");
+      (document.querySelector(".device") || document.getElementById("liveScreen") || document.body).appendChild(badge);
+    }
+    badge.textContent = `VOL ${runtime.volume}%`;
   }
 
   function closeOverlay() {
@@ -207,6 +265,7 @@
   }
 
   function showQueue() {
+    exitVolumeMode("screen-change");
     const rows = runtime.queue.length ? runtime.queue.slice(0, 8).map((item, index) => `
       <div><b>${String(index + 1).padStart(2, "0")}</b><span>${escapeHtml(item.title || "Unknown track")}<br>${escapeHtml(item.artist || "Unknown artist")}</span></div>
     `).join("") : `<p>Queue is empty.</p>`;
@@ -230,6 +289,7 @@
   }
 
   async function showRecordingLibrary(filter = runtime.recordingFilter) {
+    exitVolumeMode("screen-change");
     runtime.recordingFilter = filter;
     showLoading("PERSONAL ARCHIVE", "Reading recording metadata...");
     try {
@@ -270,6 +330,7 @@
   }
 
   async function playRecording(recordingId) {
+    exitVolumeMode("screen-change");
     try {
       const response = await fetch(`/api/recording/library?limit=100`, { cache: "no-store" });
       const payload = await response.json();
@@ -328,11 +389,12 @@
   }
 
   function showVolume() {
+    renderInputModeBadge();
     renderOverlay(`
       <div class="shaer-system-scrim"></div>
       <section class="shaer-system-popup" role="status" data-popup-kind="volume">
         <span class="shaer-system-kicker">AUDIO</span>
-        <h2>VOLUME ${runtime.volume}%</h2>
+        <h2>🔊 VOLUME ${runtime.volume}%</h2>
         <div class="shaer-volume-track" style="--volume:${runtime.volume}%"><i></i></div>
       </section>
     `);
@@ -504,19 +566,67 @@
     window.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true }));
   }
 
+  function dispatchNavigationAction(action, started) {
+    const key = keyForAction[action];
+    if (!key) return;
+    window.dispatchEvent(new CustomEvent("shaer:hardware", { detail: { action, inputMode: runtime.inputMode } }));
+    dispatchKey(key);
+    window.requestAnimationFrame(() => {
+      runtime.metrics.navigationLatencyMs = Math.round((performance.now() - started) * 10) / 10;
+    });
+  }
+
+  function handleSelectAction(started) {
+    const now = performance.now();
+    if (runtime.inputMode === INPUT_MODE_VOLUME) {
+      runtime.lastOkPressAt = 0;
+      window.clearTimeout(runtime.pendingOkTimer);
+      exitVolumeMode("ok");
+      return true;
+    }
+    if (now < runtime.suppressOkUntil) return true;
+    if (runtime.lastOkPressAt && now - runtime.lastOkPressAt <= OK_DOUBLE_PRESS_MS) {
+      window.clearTimeout(runtime.pendingOkTimer);
+      runtime.pendingOkTimer = 0;
+      runtime.lastOkPressAt = 0;
+      runtime.suppressOkUntil = now + OK_DOUBLE_PRESS_MS;
+      enterVolumeMode("double-ok");
+      return true;
+    }
+    runtime.lastOkPressAt = now;
+    window.clearTimeout(runtime.pendingOkTimer);
+    runtime.pendingOkTimer = window.setTimeout(() => {
+      runtime.pendingOkTimer = 0;
+      runtime.lastOkPressAt = 0;
+      dispatchNavigationAction("select", started);
+    }, OK_DOUBLE_PRESS_MS);
+    return true;
+  }
+
   function dispatchAction(action) {
     const started = performance.now();
     if (action.startsWith("theme:shaer_")) {
+      exitVolumeMode("screen-change");
       const themeId = action.slice(6);
       if (/^shaer_[a-z0-9_]+$/.test(themeId)) window.location.assign(`/${themeId}/?mode=device`);
       return;
     }
     if (action === "toggle_input_mode") {
-      runtime.inputMode = runtime.inputMode === "navigation" ? "volume" : "navigation";
-      document.body.dataset.shaerInputMode = runtime.inputMode;
-      window.dispatchEvent(new CustomEvent("shaer:input-mode", { detail: { mode: runtime.inputMode } }));
-      showPopup("input-mode", runtime.inputMode === "volume" ? "VOLUME MODE" : "NAVIGATION MODE", runtime.inputMode === "volume" ? "Turn the encoder to adjust volume. Double-click OK to return." : "Turn the encoder to browse. Double-click OK to adjust volume.");
+      enterVolumeMode("debug-toggle");
+      runtime.suppressOkUntil = performance.now() + OK_DOUBLE_PRESS_MS;
       return;
+    }
+    if (action === "select" && handleSelectAction(started)) return;
+    if (runtime.inputMode === INPUT_MODE_VOLUME) {
+      if (action === "back") {
+        exitVolumeMode("back");
+        return;
+      }
+      if (action === "left" || action === "right") {
+        changeVolume(action === "right" ? VOLUME_STEP_PERCENT : -VOLUME_STEP_PERCENT);
+        return;
+      }
+      exitVolumeMode("screen-change");
     }
     if (systemLayer && !systemLayer.hidden) {
       const buttons = Array.from(systemLayer.querySelectorAll("[data-system-action]"));
@@ -559,20 +669,11 @@
       return;
     }
     if (action === "volume_up" || action === "volume_down") {
-      changeVolume(action === "volume_up" ? 5 : -5);
+      enterVolumeMode("volume-button");
+      changeVolume(action === "volume_up" ? VOLUME_STEP_PERCENT : -VOLUME_STEP_PERCENT);
       return;
     }
-    if ((action === "left" || action === "right") && runtime.inputMode === "volume") {
-      changeVolume(action === "right" ? 5 : -5);
-      return;
-    }
-    const key = keyForAction[action];
-    if (!key) return;
-    window.dispatchEvent(new CustomEvent("shaer:hardware", { detail: { action, inputMode: runtime.inputMode } }));
-    dispatchKey(key);
-    window.requestAnimationFrame(() => {
-      runtime.metrics.navigationLatencyMs = Math.round((performance.now() - started) * 10) / 10;
-    });
+    dispatchNavigationAction(action, started);
   }
 
   async function pollHardware() {
@@ -674,8 +775,12 @@
 
   function applyPlayback(state) {
     if (!state || !state.source) return;
+    const previousTrackKey = runtime.playback.uri || `${runtime.playback.source}:${runtime.playback.title}:${runtime.playback.artist}`;
     runtime.playback = { ...runtime.playback, ...state };
+    const nextTrackKey = runtime.playback.uri || `${runtime.playback.source}:${runtime.playback.title}:${runtime.playback.artist}`;
+    if (previousTrackKey !== nextTrackKey && (runtime.playback.title || runtime.playback.uri)) exitVolumeMode("playback-change");
     if (Number.isFinite(runtime.playback.volume_percent)) runtime.volume = runtime.playback.volume_percent;
+    renderInputModeBadge();
     setText("[data-shaer-title]", runtime.playback.title || "Unknown Track");
     setText("[data-shaer-artist]", runtime.playback.artist || "Unknown Artist");
     setText("[data-shaer-album]", runtime.playback.album || "Unknown Album");
@@ -792,7 +897,7 @@
       ABOUT: [["Device", "SHAeR"], ["Firmware", "2026.07"], ["Renderer", theme], ["Storage", "Open details"]],
       APPEARANCE: [["Theme", theme], ["Brightness", "Device default"], ["Screen timeout", "Always on"], ["Reduced motion", "Off"]],
       PLAYBACK: [["Resume track", "On"], ["Gapless", "On"], ["Crossfade", "Off"], ["Queue memory", "On"]],
-      AUDIO: [["Output", "System default"], ["Volume step", "5%"], ["Balance", "Center"], ["Mono audio", "Off"]],
+      AUDIO: [["Output", "System default"], ["Volume step", "3%"], ["Balance", "Center"], ["Mono audio", "Off"]],
       CONNECTIVITY: [["Wi-Fi", "Configured on device"], ["Bluetooth", bluetoothAvailable ? "Available" : "Unavailable"], ["Spotify", runtime.spotifyAvailable ? "Connected" : "Reconnect"], ["Sync", syncStatus]],
       POWER: [["Battery level", powerAvailable ? "Read from hardware" : "Unavailable"], ["Charging", powerAvailable ? "Read from hardware" : "Unavailable"], ["Low power", powerAvailable ? "Available" : "Unavailable"], ["Shut down", "Confirm before action", "shutdown"]],
       DATE_TIME: [["Date", rtcAvailable ? "RTC available" : "System clock"], ["Time", rtcAvailable ? "RTC available" : "System clock"], ["Time zone", Intl.DateTimeFormat().resolvedOptions().timeZone || "Local"], ["Auto time", rtcAvailable ? "Available" : "Uses OS"]],
@@ -803,6 +908,7 @@
   }
 
   function showSettingsDomain(setting) {
+    exitVolumeMode("screen-change");
     const domain = String(setting || "").trim().toUpperCase().replace(/\s*&\s*/g, "_").replace(/\s+/g, "_");
     const label = domain === "DATE_TIME" ? "DATE & TIME" : domain.replace(/_/g, " ");
     const rows = settingsRows(domain);
@@ -877,8 +983,17 @@
 
   function changeVolume(delta) {
     runtime.volume = Math.min(100, Math.max(0, runtime.volume + delta));
+    setInputMode(INPUT_MODE_VOLUME, "volume-activity");
+    for (const media of document.querySelectorAll("audio, video")) {
+      media.volume = runtime.volume / 100;
+    }
     showVolume();
+    scheduleVolumeModeTimeout();
     apiPost("/api/spotify/control", { action: "volume", value: runtime.volume });
+    window.clearTimeout(runtime.volumePersistTimer);
+    runtime.volumePersistTimer = window.setTimeout(() => {
+      apiPost("/api/system/volume", { volume_percent: runtime.volume }, false);
+    }, 350);
     window.dispatchEvent(new CustomEvent("shaer:volume", { detail: { percent: runtime.volume } }));
   }
 
@@ -1087,6 +1202,7 @@
       "recording", "bluetooth", "spotify-login", "onboarding-qr", "loading", "error", "shutdown"
     ],
     render(state) {
+      exitVolumeMode("screen-change");
       closeOverlay();
       if (["home", "library", "album", "now-playing", "loading"].includes(state)) {
         window.dispatchEvent(new CustomEvent("shaer:validation-navigate", { detail: { state } }));
@@ -1108,7 +1224,7 @@
       }
       if (state === "boot") showBoot();
       if (state === "onboarding-qr") showOnboardingQr();
-      if (state === "volume") showVolume();
+      if (state === "volume") enterVolumeMode("validation");
       if (state === "queue") showQueue();
       if (state === "bluetooth") showUniversalConnection("bluetooth", "Bluetooth", "Looking for your trusted audio device.", [
         { action: "close", label: "Connected" },
@@ -1128,6 +1244,10 @@
   };
 
   initSystemLayer();
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") setInputMode(INPUT_MODE_NAVIGATION, "wake");
+  });
+  window.addEventListener("pageshow", () => setInputMode(INPUT_MODE_NAVIGATION, "wake"));
   installDiagnosticFixture();
   window.requestAnimationFrame(frameTick);
   window.setInterval(reportMetrics, 30000);

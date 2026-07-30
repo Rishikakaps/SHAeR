@@ -29,6 +29,7 @@ class FakeCompanion:
             "duration_s": 122,
             "cover_art_path": "/music/cover.jpg",
         }
+        self.last_settings_patch = None
 
     @staticmethod
     def envelope(data):
@@ -62,6 +63,10 @@ class FakeCompanion:
 
     def update_status(self):
         return self.envelope({"state": "idle"})
+
+    def update_settings(self, patch):
+        self.last_settings_patch = patch
+        return self.envelope({"audio": {"volume_percent": patch["audio"]["volume_percent"]}})
 
     def authenticate(self, _token):
         return {"device_id": "test-companion"}
@@ -172,6 +177,13 @@ class DeviceRouteTests(unittest.TestCase):
         status, paused = self.post("/api/music/playback", {"action": "pause"})
         self.assertEqual(status, 200)
         self.assertEqual(paused["status"], "paused")
+
+    def test_system_volume_route_clamps_and_persists_audio_setting(self):
+        status, payload = self.post("/api/system/volume", {"volume_percent": 104})
+        self.assertEqual(status, 200)
+        self.assertEqual(payload["volume_percent"], 100)
+        self.assertEqual(self.companion.last_settings_patch, {"audio": {"volume_percent": 100}})
+        self.assertEqual(server.LOCAL_PLAYBACK_STATE["volume_percent"], 100)
 
     def test_system_capabilities_keep_legacy_flags_and_structured_states(self):
         status, payload = self.get("/api/system/capabilities")

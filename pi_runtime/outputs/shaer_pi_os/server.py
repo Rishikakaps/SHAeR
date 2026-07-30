@@ -1231,6 +1231,16 @@ class ShaerHandler(SimpleHTTPRequestHandler):
             self.send_json(ApiError("invalid_request", str(exc)).payload(), status=400)
 
     def _system_post(self, path: str, payload: dict[str, object]) -> dict[str, object]:
+        if path == "/api/system/volume":
+            value = payload.get("volume_percent")
+            if not isinstance(value, (int, float)) or isinstance(value, bool):
+                raise ApiError("invalid_volume", "Volume must be a number from 0 to 100.")
+            percent = int(max(0, min(100, round(float(value)))))
+            with LOCAL_PLAYBACK_LOCK:
+                LOCAL_PLAYBACK_STATE["volume_percent"] = percent
+            if hasattr(self.companion, "update_settings"):
+                self.companion.update_settings({"audio": {"volume_percent": percent}})
+            return {"ok": True, "volume_percent": percent}
         if path == "/api/system/metrics":
             numeric = {
                 "fps": (int, float), "frames": (int, float), "navigationLatencyMs": (int, float),

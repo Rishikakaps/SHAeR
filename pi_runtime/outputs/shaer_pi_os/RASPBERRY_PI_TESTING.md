@@ -63,6 +63,16 @@ curl -X POST -H 'Content-Type: application/json' -d '{"action":"select"}' http:/
 curl -X POST -H 'Content-Type: application/json' -d '{"action":"back"}' http://127.0.0.1:8775/api/debug/input
 ```
 
+To simulate Volume Mode, send two OK/select events within 400 ms:
+
+```bash
+curl -X POST -H 'Content-Type: application/json' -d '{"action":"select"}' http://127.0.0.1:8775/api/debug/input
+curl -X POST -H 'Content-Type: application/json' -d '{"action":"select"}' http://127.0.0.1:8775/api/debug/input
+curl -X POST -H 'Content-Type: application/json' -d '{"action":"right"}' http://127.0.0.1:8775/api/debug/input
+curl -X POST -H 'Content-Type: application/json' -d '{"action":"left"}' http://127.0.0.1:8775/api/debug/input
+curl -X POST -H 'Content-Type: application/json' -d '{"action":"back"}' http://127.0.0.1:8775/api/debug/input
+```
+
 ## Theme Test Commands
 
 Run one theme at a time. Stop the current server with `Ctrl+C`, then run the next command.
@@ -106,6 +116,18 @@ chromium-browser --kiosk http://127.0.0.1:8775/shaer_indian_print/?mode=device
 5. Enter a song/list/settings page and rotate past visible rows. The selected row should scroll into view.
 6. Open now playing and press OK on play/pause. The icon/state should toggle.
 7. Open voice memos and press OK on record. The recording state/time or waveform should respond.
+
+## Dual-Mode Encoder Test
+
+1. Reboot or refresh the kiosk page. The encoder should start in Navigation Mode.
+2. Rotate clockwise. The selection should move down/right, not change volume.
+3. Press OK twice within about 400 ms. The volume overlay and `VOL` badge should appear.
+4. Rotate clockwise. Volume should increase by 3%, clamped at 100%.
+5. Rotate counter-clockwise. Volume should decrease by 3%, clamped at 0%.
+6. Press OK once. Volume Mode should exit and the encoder should return to Navigation Mode.
+7. Enter Volume Mode again, then press Back. It should exit immediately.
+8. Enter Volume Mode again and do nothing for 3 seconds. It should exit automatically.
+9. Enter Volume Mode again, then open another screen or play another song. It should exit automatically.
 
 ## Fullscreen Exit
 

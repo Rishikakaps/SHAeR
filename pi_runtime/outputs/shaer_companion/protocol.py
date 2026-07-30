@@ -123,7 +123,7 @@ class JsonStore:
 
 DEFAULT_SETTINGS: dict[str, object] = {
     "audio": {
-        "volume_limit": 90, "equalizer_preset": "flat", "bass": 0, "mid": 0,
+        "volume_percent": 50, "volume_limit": 90, "equalizer_preset": "flat", "bass": 0, "mid": 0,
         "treble": 0, "loudness": False, "replay_gain": True, "crossfade_s": 0,
         "channels": "stereo",
     },
@@ -928,7 +928,7 @@ class CompanionService:
         if not valid:
             raise ApiError("invalid_setting", f"Invalid value for {category}.{key}.")
         ranges = {
-            ("audio", "volume_limit"): (0, 100), ("audio", "bass"): (-12, 12),
+            ("audio", "volume_percent"): (0, 100), ("audio", "volume_limit"): (0, 100), ("audio", "bass"): (-12, 12),
             ("audio", "mid"): (-12, 12), ("audio", "treble"): (-12, 12),
             ("audio", "crossfade_s"): (0, 30), ("display", "brightness"): (0, 100),
             ("display", "sleep_timeout_s"): (0, 86400), ("display", "animation_speed"): (0.25, 3),
