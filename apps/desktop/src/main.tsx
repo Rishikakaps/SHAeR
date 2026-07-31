@@ -413,7 +413,7 @@ function App() {
         {activeView === "settings" && <SettingsView settingsData={settingsData} dashboard={dashboard} theme={theme} saveSetting={saveSetting} applyTheme={applyTheme} uploadAppIcon={uploadAppIcon} branding={branding} connected={connected} />}
         {activeView === "feedback" && <FeedbackView message={feedbackMessage} setMessage={setFeedbackMessage} state={feedbackState} onSend={sendFeedback} context={supportContext()} reports={feedbackReports} />}
         {activeView === "access" && <ListView eyebrow="Security" title="Linked devices" empty="Connect to inspect companion access." items={linkedDevices} />}
-        {activeView === "diagnostics" && <DiagnosticsView diagnostics={diagnostics} capabilities={capabilities} onRun={(name) => client.runDiagnostic(name).then(() => loadView("diagnostics")).catch((err) => setError(toUserFacingError(err).whatHappened))} />}
+        {activeView === "diagnostics" && <DiagnosticsView diagnostics={diagnostics} capabilities={capabilities} onRun={(name: string) => client.runDiagnostic(name).then(() => loadView("diagnostics")).catch((err) => setError(toUserFacingError(err).whatHappened))} />}
         {activeView === "updates" && <StatusView eyebrow="System" title="Firmware updates" status={updateStatus} actionLabel="Refresh update status" onAction={() => loadView("updates")} />}
         {activeView === "backup" && <StatusView eyebrow="Recovery" title="Backup & restore" status={backupStatus} actionLabel="Refresh backup status" onAction={() => loadView("backup")} />}
         {activeView === "developer" && <DeveloperView dashboard={developerDashboard} releaseDraft={releaseDraft} setReleaseDraft={setReleaseDraft} onCreateRelease={createRelease} />}
