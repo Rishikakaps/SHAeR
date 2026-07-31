@@ -89,31 +89,30 @@
         <img src="../assets/branding/app-icon-source.png" alt="SHAeR Companion red vinyl icon">
         <div>
           <h1>Download SHAeR</h1>
-          <p>Install the phone companion, download the Pi runtime, or get the desktop companion installer when the Windows release artifact is available.</p>
+          <p>Install the phone companion or desktop companion from the latest SHAeR GitHub Release.</p>
         </div>
       </header>
 
       <section class="grid">
         <article class="card">
           <h2>Phone Companion APK</h2>
-          <p>Android debug APK artifact included in this repository.</p>
-          <p><a class="download" href="../releases/SHAeR-Companion-0.17.0-debug.apk">Download APK</a></p>
-          <p><a class="download secondary" href="../releases/SHAeR-Companion-0.17.0-debug.apk.sha256">Checksum</a></p>
-        </article>
-
-        <article class="card">
-          <h2>Phone PWA Bundle</h2>
-          <p>Web companion bundle for hosting or local packaging.</p>
-          <p><a class="download" href="../releases/shaer-companion-pwa-0.17.0.zip">Download PWA ZIP</a></p>
-          <p><a class="download secondary" href="../releases/shaer-companion-pwa-0.17.0.zip.sha256">Checksum</a></p>
+          <p>Android APK built from the shared SHAeR companion app.</p>
+          <p><a class="download" href="https://github.com/Rishikakaps/SHAeR/releases/latest/download/SHAeR-Companion-Android.apk">Download APK</a></p>
+          <p><a class="download secondary" href="https://github.com/Rishikakaps/SHAeR/releases/latest/download/SHAeR-Companion-Android.apk.sha256">Checksum</a></p>
         </article>
 
         <article class="card">
           <h2>Windows Desktop</h2>
-          <p>The Windows `.exe` and `.msi` installers are built by GitHub Actions on a Windows runner.</p>
-          <p><a class="download disabled" href="#">Windows installer pending</a></p>
-          <p>After release, replace this link with the hosted `.exe` or `.msi` URL.</p>
-          <img id="windowsQr" class="qr" alt="QR code for Windows installer" hidden>
+          <p>Windows installer for SHAeR Desktop Companion.</p>
+          <p><a class="download" href="https://github.com/Rishikakaps/SHAeR/releases/latest/download/SHAeR-Desktop-Companion-Windows-Setup.exe">Download EXE</a></p>
+          <p><a class="download secondary" href="https://github.com/Rishikakaps/SHAeR/releases/latest/download/SHAeR-Desktop-Companion-Windows.msi">Download MSI</a></p>
+        </article>
+
+        <article class="card">
+          <h2>macOS Desktop</h2>
+          <p>Mac installer for SHAeR Desktop Companion.</p>
+          <p><a class="download" href="https://github.com/Rishikakaps/SHAeR/releases/latest/download/SHAeR-Desktop-Companion-macOS.dmg">Download DMG</a></p>
+          <p><a class="download secondary" href="https://github.com/Rishikakaps/SHAeR/releases/latest/download/SHAeR-Desktop-Companion-macOS.app.zip">Download APP ZIP</a></p>
         </article>
 
         <article class="card">
@@ -131,18 +130,5 @@
         </article>
       </section>
     </main>
-    <script>
-      const params = new URLSearchParams(location.search);
-      const windowsUrl = params.get("windows");
-      if (windowsUrl) {
-        const link = document.querySelector(".card:nth-child(3) .download");
-        const qr = document.getElementById("windowsQr");
-        link.classList.remove("disabled");
-        link.href = windowsUrl;
-        link.textContent = "Download Windows Installer";
-        qr.hidden = false;
-        qr.src = "https://api.qrserver.com/v1/create-qr-code/?size=360x360&data=" + encodeURIComponent(windowsUrl);
-      }
-    </script>
   </body>
 </html>
