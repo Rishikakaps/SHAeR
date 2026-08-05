@@ -612,7 +612,7 @@
       return;
     }
     if (action === "toggle_input_mode") {
-      enterVolumeMode("debug-toggle");
+      if (!exitVolumeMode("debug-toggle")) enterVolumeMode("debug-toggle");
       runtime.suppressOkUntil = performance.now() + OK_DOUBLE_PRESS_MS;
       return;
     }
@@ -1136,6 +1136,10 @@
     if (event.key === "q" || event.key === "Q") showQueue();
     if (event.key === "+" || event.key === "=") changeVolume(5);
     if (event.key === "-" || event.key === "_") changeVolume(-5);
+    if (validationMode && (event.key === "v" || event.key === "V")) {
+      event.preventDefault();
+      dispatchAction("toggle_input_mode");
+    }
     if (event.key === "b" || event.key === "B") {
       showUniversalConnection("bluetooth", "Bluetooth", "No audio device is connected.", [
         { action: "close", label: "Paired" },

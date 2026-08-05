@@ -1,0 +1,12 @@
+[Unit]
+Description=SHAeR Spotify metadata and auth service
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/shaer
+ExecStart=/usr/bin/python3 /opt/shaer/services/spotify/spotify_service.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

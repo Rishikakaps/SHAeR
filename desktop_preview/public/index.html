@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SHAeR Desktop Preview</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main class="workspace">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Firmware renderer</p>
+        <h1>SHAeR Desktop Preview</h1>
+        <p class="lede">One firmware UI, rendered here for inspection before it reaches the device.</p>
+      </div>
+      <div class="live"><span class="live-dot"></span><span id="connection">Native backend live</span></div>
+    </header>
+
+    <section class="preview-layout">
+      <div class="device-column">
+        <div class="device-shell">
+          <div class="device-label"><span>SHAeR</span><span id="theme-label">SHAeR Default</span></div>
+          <div class="screen-wrap"><canvas id="screen" width="240" height="320" aria-label="SHAeR 240 by 320 firmware screen"></canvas></div>
+          <div class="device-hardware"><span class="hardware-mark">SHAeR</span><span class="encoder-ring"></span><span class="ok-mark">OK</span></div>
+        </div>
+        <p class="screen-caption"><strong id="screen-label">Boot</strong><span>240 × 320 exact frame</span></p>
+      </div>
+
+      <aside class="control-panel">
+        <section class="panel-section">
+          <div class="section-heading"><h2>Theme</h2><span id="theme-id">default</span></div>
+          <select id="theme-select" aria-label="Theme selector">
+            <option value="default">SHAeR Default</option>
+            <option value="archive_dark">Archive Dark</option>
+            <option value="bombay_ticket">Bombay Ticket</option>
+            <option value="indian_raga">Indian Raga</option>
+            <option value="windows_xp">Windows XP</option>
+            <option value="japanese_punk">Japanese Punk</option>
+            <option value="ghibli_garden">Ghibli Garden</option>
+          </select>
+          <button class="wide-button" data-action="theme">Change Theme</button>
+        </section>
+
+        <section class="panel-section">
+          <div class="section-heading"><h2>Firmware input</h2><span>encoder + keys</span></div>
+          <div class="button-grid">
+            <button data-action="ccw" title="Rotate Encoder CCW">↶ <span>Rotate CCW</span></button>
+            <button data-action="cw" title="Rotate Encoder CW">↷ <span>Rotate CW</span></button>
+            <button data-action="click">OK <span>Click Encoder</span></button>
+            <button data-action="back">← <span>Back</span></button>
+            <button data-action="play">▶ <span>Play</span></button>
+            <button data-action="pause">Ⅱ <span>Pause</span></button>
+            <button data-action="previous">|◀ <span>Previous</span></button>
+            <button data-action="next">▶| <span>Next</span></button>
+            <button data-action="sleep">◒ <span>Sleep</span></button>
+            <button data-action="wake">◓ <span>Wake</span></button>
+          </div>
+        </section>
+
+        <section class="panel-section">
+          <div class="section-heading"><h2>Fake device states</h2><span>input routes through firmware</span></div>
+          <div class="state-grid">
+            <button data-action="spotify">Spotify</button>
+            <button data-action="local">Local Music</button>
+            <button data-action="recorder">Recorder</button>
+            <button data-action="marginalia">Marginalia</button>
+            <button data-action="bluetooth">Bluetooth</button>
+            <button data-action="battery">Battery</button>
+            <button data-action="wifi">Wi-Fi</button>
+            <button data-action="sdcard">SD Card</button>
+          </div>
+        </section>
+        <section class="panel-section debug-panel">
+          <div class="section-heading"><h2>Developer debug</h2><span>preview only</span></div>
+          <dl class="telemetry">
+            <div><dt>Theme</dt><dd id="debug-theme">SHAeR Default</dd></div>
+            <div><dt>Screen</dt><dd id="debug-screen">Home</dd></div>
+            <div><dt>Playback</dt><dd id="debug-playback">Stopped</dd></div>
+            <div><dt>Song</dt><dd id="debug-song">No active song</dd></div>
+            <div><dt>Battery</dt><dd id="debug-battery">82%</dd></div>
+            <div><dt>Bluetooth</dt><dd id="debug-bluetooth">Disconnected</dd></div>
+            <div><dt>Spotify</dt><dd id="debug-spotify">Disconnected</dd></div>
+            <div><dt>Wi-Fi</dt><dd id="debug-wifi">Connected</dd></div>
+          </dl>
+          <div class="debug-subheading">Encoder</div>
+          <div class="debug-inputs">
+            <button data-action="ccw">↶</button><button data-action="cw">↷</button><button data-action="click">Click</button><button data-action="back">Back</button>
+          </div>
+          <div class="debug-subheading">Jump to</div>
+          <div class="jump-grid">
+            <button data-debug-action="home">Home</button><button data-debug-action="library">Library</button><button data-debug-action="playlist">Playlist</button><button data-debug-action="recorder">Recorder</button><button data-debug-action="settings">Settings</button><button data-debug-action="marginalia">Marginalia</button>
+          </div>
+          <div class="debug-subheading">Overlay</div>
+          <div class="overlay-list">
+            <label><input type="checkbox" data-overlay="grid"> Show Layout Grid</label>
+            <label><input type="checkbox" data-overlay="bounds"> Show Widget Bounds</label>
+            <label><input type="checkbox" data-overlay="safe"> Show Safe Margins</label>
+            <label><input type="checkbox" data-overlay="ids"> Show Widget IDs</label>
+            <label><input type="checkbox" data-overlay="fps"> Show FPS</label>
+          </div>
+        </section>
+        <p class="status" id="status">Ready. The canvas is drawn from native UiCommand data.</p>
+      </aside>
+    </section>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>

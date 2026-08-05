@@ -1,0 +1,29 @@
+{
+  "id": "bombay_ticket",
+  "display_name": "Bombay Ticket",
+  "target_resolution": [240, 320],
+  "palette": {
+    "bg": "#f4e9ca",
+    "paper": "#fff8df",
+    "ink": "#2f241a",
+    "muted": "#765235",
+    "accent": "#b9342d",
+    "accent_secondary": "#1f6655",
+    "selection": "#b9342d"
+  },
+  "screens": {
+    "boot": ["ticket_border", "stamp_loading", "libra_mark"],
+    "home": ["ticket_menu", "platform_row_numbers", "perforated_edges"],
+    "library": ["ledger_rows", "ticket_punch_selection"],
+    "now_playing": ["song_stamp", "ticket_stub_art_zone", "railway_progress"],
+    "settings": ["form_rows", "stamp_selection"],
+    "spotify_drop": ["counter_notice", "ok_opens_local_library"],
+    "charging": ["ticket_charge_slip", "green_paid_mark"],
+    "sleep": ["unified_aod", "paper_dim"]
+  },
+  "motion": {
+    "style": "ticket_punch",
+    "max_animated_elements": 5,
+    "battery_saver_fps": 10
+  }
+}

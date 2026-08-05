@@ -1,0 +1,26 @@
+[Unit]
+Description=आदि Vasi OS foreground shell
+After=local-fs.target systemd-user-sessions.service sound.target bluetooth.target network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=30
+StartLimitBurst=3
+
+[Service]
+Type=simple
+User=shaer
+Group=shaer
+WorkingDirectory=/opt/shaer
+Environment="SHAER_OS_NAME=आदि Vasi OS"
+Environment=SDL_NOMOUSE=1
+TTYPath=/dev/tty1
+StandardInput=tty
+StandardOutput=journal
+StandardError=journal
+ExecStartPre=/usr/bin/setterm -cursor off -blank 0 -powersave off -powerdown 0
+ExecStart=/opt/shaer/build/shaer_pi_bringup
+Restart=on-failure
+RestartSec=1
+TimeoutStopSec=12
+
+[Install]
+WantedBy=multi-user.target

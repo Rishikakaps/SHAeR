@@ -1,0 +1,23 @@
+{
+  "audio": {
+    "crossfade_seconds": 0,
+    "replaygain_mode": "off",
+    "replaygain_preamp_db": 0.0,
+    "replaygain_prevent_clipping": true,
+    "quality_mode": "balanced",
+    "volume_step": 2
+  },
+  "spotify": {
+    "auth_state": "not_configured",
+    "token_store": "/var/lib/shaer/spotify_token.json"
+  },
+  "ui": {
+    "theme": "archive_dark",
+    "emotional_tone": {
+      "boot": "anticipation",
+      "now_playing": "calm_immersion",
+      "errors": "playful_not_alarming"
+    }
+  }
+}
+

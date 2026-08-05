@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- SHAeR's verified LAN protocol is HTTP. The app never sends credentials
+         during discovery; pairing remains protected by the existing API flow. -->
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

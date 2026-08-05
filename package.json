@@ -6,5 +6,8 @@
     "dev": "node desktop_preview/server.js",
     "build": "make -C native_firmware preview",
     "test": "npm run build && node desktop_preview/test_backend.js"
+  },
+  "devDependencies": {
+    "playwright": "1.62.0"
   }
 }

@@ -1,0 +1,29 @@
+{
+  "id": "ghibli_garden",
+  "display_name": "Ghibli Garden",
+  "target_resolution": [240, 320],
+  "palette": {
+    "bg": "#e8dfc8",
+    "paper": "#f8f1dc",
+    "ink": "#44382e",
+    "muted": "#746b58",
+    "accent": "#d6906e",
+    "accent_secondary": "#86a97c",
+    "selection": "#86a97c"
+  },
+  "screens": {
+    "boot": ["watercolor_wash", "libra_fireflies", "quiet_identity"],
+    "home": ["soft_menu_cards", "leaf_selection"],
+    "library": ["shelf_rows", "rounded_selection"],
+    "now_playing": ["garden_art_zone", "moss_progress", "soft_labels"],
+    "settings": ["little_settings_rows", "leaf_selection"],
+    "spotify_drop": ["gentle_notice_popup", "ok_opens_local_library"],
+    "charging": ["warm_window_battery"],
+    "sleep": ["unified_aod", "watercolor_dim"]
+  },
+  "motion": {
+    "style": "leaf_drift",
+    "max_animated_elements": 5,
+    "battery_saver_fps": 10
+  }
+}

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SHAeR Pixel UI</title>
+  <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="stage" aria-label="SHAeR device preview">
+      <div class="device-frame">
+        <canvas id="screen" width="240" height="320" aria-label="SHAeR 240 by 320 screen"></canvas>
+        <div class="hardware-bar" aria-hidden="true">
+          <button class="hw round" data-input="back" title="Back"></button>
+          <button class="hw pill" data-input="up" title="Up"></button>
+          <button class="hw pill" data-input="down" title="Down"></button>
+          <button class="hw round" data-input="ok" title="OK"></button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="panel" aria-label="Theme and screen controls">
+      <div class="theme-grid" id="themeGrid"></div>
+      <div class="screen-grid" id="screenGrid"></div>
+      <div class="state-card">
+        <div class="state-row"><span>theme</span><strong id="themeName"></strong></div>
+        <div class="state-row"><span>screen</span><strong id="screenName"></strong></div>
+        <div class="state-row"><span>selection</span><strong id="selectionName"></strong></div>
+      </div>
+    </aside>
+  </main>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>

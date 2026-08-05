@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SHAeR Dark Archive</title>
+  <link rel="stylesheet" href="src/dark-archive.css?v=20260713">
+  <link rel="stylesheet" href="../shaer_pi_os/system-overlays.css?v=20260730a">
+</head>
+<body>
+  <main class="workspace">
+    <section class="hero-pair" aria-label="Boot screens">
+      <article class="screen boot constellation-screen" data-name="boot-constellation">
+        <div class="constellation">
+          <svg viewBox="0 0 240 320" aria-hidden="true">
+            <polyline points="26,112 63,94 87,76 122,31 210,79 195,161 130,204 118,224 108,242" />
+          </svg>
+          <i style="--x:26px;--y:112px;--s:18px"></i>
+          <i style="--x:63px;--y:94px;--s:9px"></i>
+          <i style="--x:87px;--y:76px;--s:10px"></i>
+          <i style="--x:122px;--y:31px;--s:14px"></i>
+          <i style="--x:210px;--y:79px;--s:17px"></i>
+          <i style="--x:195px;--y:161px;--s:14px"></i>
+          <i style="--x:130px;--y:204px;--s:9px"></i>
+          <i style="--x:118px;--y:224px;--s:16px"></i>
+        </div>
+        <div class="boot-brand">
+          <strong>SHAeR</strong>
+          <span>POWERED BY आदि-VASI</span>
+        </div>
+      </article>
+
+      <article class="screen boot loading-identity-screen" data-name="boot-loading">
+        <div class="loading-title">
+          <strong>LOADING</strong>
+          <span>आदि-VASI OS</span>
+        </div>
+        <div class="identity-bar"><span></span></div>
+        <p>PLEASE WAIT.......</p>
+      </article>
+    </section>
+
+    <section class="screen-strip" id="screenStrip" aria-label="Dark Archive screen set"></section>
+
+    <section class="live-area" aria-label="Interactive dark archive renderer">
+      <article class="device">
+        <div id="liveScreen" class="live-screen"></div>
+      </article>
+      <nav class="screen-picker" id="screenPicker" aria-label="Dark Archive screens"></nav>
+    </section>
+  </main>
+
+  <template id="homeTemplate">
+    <article class="screen archive-screen screen-home" data-name="home">
+      <div class="topbar"><b>HOME</b><span>12:15 PM</span></div>
+      <div class="home-menu terminal-list">
+        <p>[0] LOCAL FILES</p>
+        <p>[1] SPOTIFY CONNECT</p>
+        <p>[2] VOICE MEMOS</p>
+        <p>[3] SETTINGS</p>
+      </div>
+      <div class="footer"><span>12th Aug 2026</span><b>30%</b></div>
+    </article>
+  </template>
+
+  <template id="loadingTemplate">
+    <article class="screen archive-screen screen-loading" data-name="loading">
+      <div class="topbar"><b>LOADING</b><span>12:15 PM</span></div>
+      <div class="archive-loading-identity">
+        <strong>LOADING</strong>
+        <span>आदि-VASI OS</span>
+      </div>
+      <div class="archive-loading-progress"><i data-loading-progress></i></div>
+      <p class="archive-loading-copy">PLEASE WAIT.......</p>
+      <div class="footer"><span>12th Aug 2026</span><b>30%</b></div>
+    </article>
+  </template>
+
+  <template id="libraryTemplate">
+    <article class="screen archive-screen screen-library-list" data-name="library-list">
+      <div class="topbar"><b>LIBRARY</b><span>12:15 PM</span></div>
+      <h2>MY MUSIC</h2>
+      <div class="terminal-list library-list" data-music-list></div>
+      <div class="footer"><span>12th Aug 2026</span><b>30%</b></div>
+    </article>
+  </template>
+
+  <template id="playlistSongsTemplate">
+    <article class="screen archive-screen screen-playlist-songs" data-name="playlist-songs">
+      <div class="topbar"><b>PLAYLIST</b><span>12:15 PM</span></div>
+      <h2 data-music-heading>SAVED TRACKS</h2>
+      <div class="terminal-list song-list" data-track-list></div>
+      <div class="footer"><span>12th Aug 2026</span><b>30%</b></div>
+    </article>
+  </template>
+
+  <template id="playingTemplate">
+    <article class="screen archive-screen screen-playing" data-name="now-playing">
+      <div class="topbar"><b>PLAYING</b><span>12:15 PM</span></div>
+      <div class="playing-title">NOW PLAYING</div>
+      <div class="track-panel">
+        <div class="cover" data-shaer-cover></div>
+        <div class="track-data">
+          <p>IN QUEUE</p>
+          <ol data-shaer-queue></ol>
+        </div>
+      </div>
+      <div class="song-meta">
+        <strong data-shaer-title>NOTHING PLAYING</strong>
+        <span data-shaer-artist>CHOOSE MUSIC</span>
+        <small data-shaer-album></small>
+      </div>
+      <div class="archive-player">
+        <div class="player-time"><span data-shaer-elapsed>00:12</span><b data-shaer-duration>3:12</b></div>
+        <div class="player-progress"><i data-shaer-progress></i></div>
+        <div class="player-controls">
+          <i class="shuffle"></i>
+          <i class="prev"></i>
+          <i class="play"></i>
+          <i class="next"></i>
+          <i class="repeat"></i>
+        </div>
+      </div>
+      <div class="footer"><span>12th Aug 2026</span><b>30%</b></div>
+    </article>
+  </template>
+
+  <template id="memosTemplate">
+    <article class="screen archive-screen screen-memos" data-name="memos">
+      <div class="topbar"><b>MEMOS</b><span>12:15 PM</span></div>
+      <div class="memo-wave" aria-label="Recording waveform">
+        <strong>VOICE MEMO</strong>
+        <div class="memo-bars">
+          <i style="--h:18px;--i:0"></i><i style="--h:39px;--i:1"></i><i style="--h:62px;--i:2"></i><i style="--h:30px;--i:3"></i><i style="--h:74px;--i:4"></i>
+          <i style="--h:46px;--i:5"></i><i style="--h:22px;--i:6"></i><i style="--h:58px;--i:7"></i><i style="--h:82px;--i:8"></i><i style="--h:36px;--i:9"></i>
+          <i style="--h:20px;--i:10"></i><i style="--h:51px;--i:11"></i><i style="--h:70px;--i:12"></i><i style="--h:43px;--i:13"></i><i style="--h:26px;--i:14"></i>
+        </div>
+      </div>
+      <div class="memo-buttons"><span>REPLAY</span><b></b><span>DONE</span></div>
+      <div class="footer"><span>12th Aug 2026</span><b>30%</b></div>
+    </article>
+  </template>
+
+  <template id="settingsTemplate">
+    <article class="screen archive-screen screen-settings" data-name="settings">
+      <div class="topbar"><b>SETTINGS</b><span>12:15 PM</span></div>
+      <div class="settings-list terminal-list">
+        <p>&gt; ABOUT</p>
+        <p>&gt; APPEARANCE</p>
+        <p>&gt; PLAYBACK</p>
+        <p>&gt; AUDIO</p>
+        <p>&gt; CONNECTIVITY</p>
+        <p>&gt; POWER</p>
+        <p>&gt; DATE &amp; TIME</p>
+        <p>&gt; SYNC</p>
+        <p>&gt; ADVANCED</p>
+      </div>
+      <div class="footer"><span>12th Aug 2026</span><b>30%</b></div>
+    </article>
+  </template>
+
+  <template id="asciiTemplate">
+    <article class="screen archive-screen screen-ascii" data-name="ascii-home">
+      <div class="topbar"><b>HOME</b><span>12:15 PM</span></div>
+      <pre>
+           .-.
+        .-'   '-.
+      .'   .-.   '.
+     /   .'   '.   \
+    ;   /  SHAeR\   ;
+    |  |  ARCHIVE|  |
+    ;   \       /   ;
+     \   '.   .'   /
+      '.   '-'   .'
+        '-.   .-'
+           '-'
+      </pre>
+      <div class="footer"><span>12th Aug 2026</span><b>30%</b></div>
+    </article>
+  </template>
+
+  <template id="chargingTemplate">
+    <article class="screen archive-screen screen-charging" data-name="charging">
+      <div class="topbar"><b>CHARGING</b><span>12:15 PM</span></div>
+      <div class="walking-charge">
+        <pre class="walk walk-a">   .o.
+  /|\
+   |
+  / \
+_/   \</pre>
+        <pre class="walk walk-b">   .o.
+  \|/
+   |
+  / \
+ /   \_</pre>
+        <strong>SHAeR</strong>
+        <span>powered by आदि-VASI</span>
+        <div class="walk-bar"><i></i></div>
+      </div>
+      <div class="footer"><span>12th Aug 2026</span><b>87%</b></div>
+    </article>
+  </template>
+
+  <script src="../shaer_pi_os/music-store.js?v=20260718"></script>
+  <script src="../shaer_pi_os/firmware-core.js?v=20260730d"></script>
+  <script src="src/dark-archive.js?v=20260718"></script>
+  <script src="../shaer_pi_os/hardware-bridge.js?v=20260730a"></script>
+</body>
+</html>

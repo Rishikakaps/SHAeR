@@ -1,0 +1,29 @@
+{
+  "id": "windows_xp",
+  "display_name": "Windows XP",
+  "target_resolution": [240, 320],
+  "palette": {
+    "bg": "#ece9d8",
+    "window": "#ffffff",
+    "ink": "#101010",
+    "muted": "#4b4b4b",
+    "accent": "#245edb",
+    "accent_secondary": "#3ba83b",
+    "selection": "#316ac5"
+  },
+  "screens": {
+    "boot": ["xp_loading_window", "progress_blocks", "libra_dialog"],
+    "home": ["start_menu_list", "desktop_window_chrome"],
+    "library": ["explorer_music_folder", "selected_blue_row"],
+    "now_playing": ["media_window", "album_art_panel", "green_progress"],
+    "settings": ["control_panel_list", "selected_blue_row"],
+    "spotify_drop": ["modal_dialog", "ok_opens_local_library"],
+    "charging": ["system_tray_battery_dialog"],
+    "sleep": ["unified_aod", "screensaver_dim"]
+  },
+  "motion": {
+    "style": "window_restore",
+    "max_animated_elements": 4,
+    "battery_saver_fps": 12
+  }
+}

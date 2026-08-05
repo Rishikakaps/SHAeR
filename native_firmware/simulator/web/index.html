@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SHAeR Renderer Simulator</title>
+  <style>
+    :root { --page:#efede7; --ink:#171511; --muted:#655f55; --line:#d4ccbf; --w:206px; --h:354px; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; background:var(--page); color:var(--ink); font-family:Inter,system-ui,sans-serif; }
+    header { padding:20px clamp(16px,4vw,42px); background:#fbfaf7; border-bottom:1px solid var(--line); }
+    h1 { margin:0; font-size:24px; letter-spacing:0; }
+    .sub { margin:7px 0 0; color:var(--muted); max-width:920px; line-height:1.45; }
+    .controls { position:sticky; top:0; z-index:5; display:flex; flex-wrap:wrap; gap:8px; padding:12px clamp(16px,4vw,42px); border-bottom:1px solid var(--line); background:#fffdf9; }
+    button { border:1px solid #b8afa1; border-radius:7px; padding:8px 10px; background:#fff; color:#171511; font:inherit; cursor:pointer; }
+    button.active { background:#171511; color:#fff; border-color:#171511; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:24px; padding:24px clamp(16px,4vw,42px) 40px; }
+    .theme-card { display:grid; justify-items:center; gap:10px; }
+    .device { width:var(--w); height:var(--h); position:relative; border-radius:22px; padding:13px; box-shadow:0 18px 38px rgba(25,21,12,.2); overflow:hidden; }
+    .screen { height:272px; position:relative; overflow:hidden; border-radius:10px; isolation:isolate; }
+    .screen::before, .screen::after { content:""; position:absolute; inset:0; pointer-events:none; z-index:2; }
+    .screen::before { background:repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 1px,transparent 1px 4px); mix-blend-mode:screen; opacity:.5; }
+    .screen::after { box-shadow:inset 0 0 28px rgba(0,0,0,.32); }
+    .top { display:flex; justify-content:space-between; gap:8px; padding:7px 8px 5px; font:10px/1 "Courier New",monospace; text-transform:uppercase; }
+    .content { position:relative; z-index:1; min-height:216px; padding:8px; }
+    .footer { position:absolute; left:7px; right:7px; bottom:5px; z-index:3; display:flex; justify-content:space-between; font:9px/1 "Courier New",monospace; letter-spacing:.02em; }
+    .pixel { font-family:"Courier New","Monaco",monospace; font-weight:800; text-rendering:geometricPrecision; }
+    .title { font-size:10px; text-transform:uppercase; letter-spacing:.08em; opacity:.78; margin-bottom:6px; }
+    .track { font-size:18px; line-height:1.03; margin:0 0 5px; }
+    .artist { font-size:11px; margin:0 0 8px; opacity:.78; }
+    .rows { display:grid; gap:5px; }
+    .row { min-height:24px; display:flex; align-items:center; justify-content:space-between; padding:5px 6px; font-size:10px; overflow:hidden; }
+    .row span:first-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .progress { height:8px; margin-top:10px; overflow:hidden; }
+    .fill { height:100%; width:58%; animation:progressPulse 2.2s ease-in-out infinite; }
+    .popup { margin-top:8px; padding:9px; border:2px solid currentColor; }
+    .constellation { position:absolute; inset:34px 14px 42px; }
+    .star { position:absolute; width:4px; height:4px; border-radius:50%; background:currentColor; animation:twinkle 1.6s ease-in-out infinite; }
+    .star:nth-child(1){left:18%;top:22%}.star:nth-child(2){left:42%;top:14%;animation-delay:.2s}.star:nth-child(3){left:68%;top:28%;animation-delay:.4s}.star:nth-child(4){left:35%;top:55%;animation-delay:.6s}.star:nth-child(5){left:72%;top:68%;animation-delay:.8s}
+    .constellation svg { position:absolute; inset:0; width:100%; height:100%; stroke:currentColor; opacity:.55; stroke-dasharray:220; animation:drawLine 2.8s ease-in-out infinite; }
+    .charge { display:grid; place-items:center; min-height:168px; }
+    .cell { width:86px; height:36px; border:3px solid currentColor; position:relative; }
+    .cell::after { content:""; position:absolute; right:-10px; top:9px; width:7px; height:12px; background:currentColor; }
+    .cell span { display:block; height:100%; width:68%; animation:charge 2.4s steps(5,end) infinite; }
+    .sleep-mark { font-size:42px; text-align:center; margin-top:40px; animation:breathe 3s ease-in-out infinite; }
+    .motion-note { position:absolute; left:9px; right:9px; bottom:22px; z-index:3; font-size:9px; opacity:.72; }
+    .hardware { position:absolute; left:20px; right:20px; bottom:15px; display:flex; justify-content:space-between; color:rgba(255,255,255,.72); }
+    .wheel { width:28px; height:28px; border:2px solid currentColor; border-radius:50%; }
+    .buttons { display:flex; gap:6px; align-items:center; }
+    .dot { width:9px; height:9px; border-radius:50%; background:currentColor; }
+    .caption { width:var(--w); font-size:12px; color:var(--muted); line-height:1.35; }
+    .caption strong { display:block; color:var(--ink); }
+
+    .archive { background:#111816; color:#bfffd2; }
+    .archive .screen { background:#050b09; border:1px solid #2d9d63; box-shadow:inset 0 0 26px rgba(71,255,139,.14); }
+    .archive .now-art { white-space:pre; font-size:10px; line-height:1.05; color:#78ff9f; margin:6px 0; }
+    .archive .row { border:1px solid #1f5d3d; background:rgba(12,45,31,.72); }
+    .archive .selected { background:#bfffd2; color:#06100d; }
+    .archive .progress { border:1px solid #2d9d63; } .archive .fill,.archive .cell span { background:#77ff9f; }
+
+    .bombay { background:#672b1e; color:#3f2118; }
+    .bombay .screen { background:#f3d9a8; border:2px dashed #a13e2a; }
+    .bombay .top,.bombay .footer { color:#7b2e22; }
+    .bombay .row { background:#ffe8b9; border-left:8px solid #b7422b; box-shadow:inset 0 -1px #d79a56; }
+    .bombay .selected { background:#b7422b; color:#fff3d4; } .bombay .fill,.bombay .cell span { background:#1f5c4a; }
+
+    .raga { background:#020126; color:#d8ccff; }
+    .raga .screen { background:#020126; border:2px solid #5b498a; box-shadow:inset 0 0 30px rgba(91,73,138,.36); }
+    .raga .content { background-image:linear-gradient(135deg,rgba(91,73,138,.18) 25%,transparent 25%),linear-gradient(225deg,rgba(91,73,138,.12) 25%,transparent 25%); background-size:18px 18px; }
+    .raga .row { background:rgba(91,73,138,.24); border:1px solid #5b498a; }
+    .raga .selected { background:#592004; color:#fff1dd; } .raga .fill,.raga .cell span { background:#592004; }
+
+    .xp { background:#1d4ea4; color:#111; font-family:Tahoma,Verdana,sans-serif; }
+    .xp .screen { background:#ece9d8; border:2px solid #245edb; border-radius:7px; }
+    .xp .top { background:linear-gradient(#3a8bfd,#1745aa); color:white; padding:6px 7px; }
+    .xp .row { background:white; border:1px solid #aca899; }
+    .xp .selected { background:#316ac5; color:white; outline:1px dotted white; outline-offset:-3px; }
+    .xp .fill,.xp .cell span { background:#3ba83b; }
+
+    .punk { background:#111; color:#f4f0e8; }
+    .punk .screen { background:#181818; border:2px solid #ed2a70; transform:rotate(-.35deg); }
+    .punk .row { background:#f4f0e8; color:#111; transform:skew(-4deg); border-right:9px solid #ed2a70; }
+    .punk .selected { background:#70f1d1; color:#111; } .punk .fill,.punk .cell span { background:#ed2a70; }
+
+    .ghibli { background:#86a97c; color:#43392e; }
+    .ghibli .screen { background:#f2ead4; border:1px solid #b8a985; border-radius:16px; }
+    .ghibli .content { background:radial-gradient(circle at 20% 20%,rgba(134,169,124,.2),transparent 28%),radial-gradient(circle at 80% 0%,rgba(214,144,110,.17),transparent 32%); }
+    .ghibli .row { background:rgba(255,253,244,.78); border:1px solid rgba(86,99,65,.22); border-radius:8px; }
+    .ghibli .selected { background:#d6906e; color:#fffdf4; } .ghibli .fill,.ghibli .cell span { background:#86a97c; }
+
+    .battery-saver .screen { filter:saturate(.65) brightness(.82); }
+    .battery-saver .motion-note::after { content:" · 12fps · reduced motion"; }
+    @keyframes twinkle { 0%,100%{opacity:.25;transform:scale(.8)} 50%{opacity:1;transform:scale(1.4)} }
+    @keyframes drawLine { 0%{stroke-dashoffset:220} 55%,100%{stroke-dashoffset:0} }
+    @keyframes progressPulse { 0%,100%{filter:brightness(.85)} 50%{filter:brightness(1.35)} }
+    @keyframes charge { 0%{width:12%} 100%{width:94%} }
+    @keyframes breathe { 0%,100%{opacity:.42;transform:scale(.96)} 50%{opacity:1;transform:scale(1.03)} }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>SHAeR Renderer Simulator</h1>
+    <p class="sub">Reference renderer for non-hardware work: six skins, all core screens, popups, transitions, Libra boot, charging, sleep, battery saver, and old-device timestamp/battery footer.</p>
+  </header>
+  <nav class="controls" aria-label="Screen controls">
+    <button class="active" data-screen="boot">Boot</button><button data-screen="home">Home</button><button data-screen="library">Library</button><button data-screen="now">Now Playing</button><button data-screen="settings">Settings</button><button data-screen="spotify">Spotify Popup</button><button data-screen="wifi">WiFi Popup</button><button data-screen="bluetooth">Bluetooth Popup</button><button data-screen="charging">Charging</button><button data-screen="sleep">Sleep</button><button id="power">Battery Saver</button>
+  </nav>
+  <main class="grid" id="grid"></main>
+  <template id="tpl">
+    <article class="theme-card"><section class="device"><div class="screen pixel"><div class="top"><span class="mode"></span><span class="signal"></span></div><div class="content"></div><div class="motion-note"></div><div class="footer"><span class="stamp"></span><span class="battery"></span></div></div><div class="hardware"><div class="wheel"></div><div class="buttons"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div></div></section><p class="caption"></p></article>
+  </template>
+  <script>
+    const themes = [
+      {id:"archive", name:"Dark Archival", motion:"ASCII scanlines, cursor blink", rows:["NOW_PLAYING","LOCAL_LIBRARY","SETTINGS","THEME_NEXT"], lib:["demo_track.mp3","voice_memory.mp3","flac_test.flac"], set:["theme.active","audio.crossfade","audio.replaygain"]},
+      {id:"bombay", name:"Bombay Ticket", motion:"ticket punch, platform board flip", rows:["NOW PLAYING","LOCAL ARCHIVE","SETTINGS","CHANGE ROUTE"], lib:["DEMO TRACK - A1","VOICE MEMORY - parcel","FLAC TEST - berth"], set:["route theme","crossfade window","replaygain clerk"]},
+      {id:"raga", name:"Indian Raga", motion:"indigo curtain, lavender shimmer", rows:["NOW PLAYING","LIBRARY RAAG","SETTINGS","NEXT RASA"], lib:["Demo Track in Raag I","Voice Memory alaap","FLAC Test vilambit"], set:["theme raag","crossfade laya","replaygain sur"]},
+      {id:"xp", name:"Windows XP", motion:"window restore, progress blocks", rows:["Now Playing.exe","Local Library","Control Panel","Change Theme"], lib:["Demo Track.mp3","Voice Memory.mp3","FLAC Test.flac"], set:["Appearance","Audio","Power"]},
+      {id:"punk", name:"Japanese Punk", motion:"sticker slap, neon hard cut", rows:["PLAY //","ARCHIVE //","SETUP //","SKIN //"], lib:["DEMO TRACK","VOICE MEMO","FLAC TEST"], set:["THEME","CROSSFADE","GAIN"]},
+      {id:"ghibli", name:"Ghibli Garden", motion:"watercolor bloom, leaf drift", rows:["Now Playing","Archive Shelf","Little Settings","Change Weather"], lib:["Demo Track packet","Voice Memory jar","FLAC Test leaf"], set:["theme weather","crossfade path","replaygain jar"]}
+    ];
+    let screen = "boot", saver = false;
+    const grid = document.getElementById("grid"), tpl = document.getElementById("tpl");
+    function timeStamp() {
+      const d = new Date();
+      const date = d.toLocaleDateString(undefined,{month:"short",day:"2-digit"});
+      const time = d.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit",hour12:true});
+      return `${date} ${time}`;
+    }
+    function rows(items, selected=0) { return `<div class="rows">${items.map((x,i)=>`<div class="row ${i===selected?"selected":""}"><span>${x}</span><span>${String(i+1).padStart(2,"0")}</span></div>`).join("")}</div>`; }
+    function boot() { return `<div class="title">LIBRA CONSTELLATION BOOT</div><div class="constellation"><svg viewBox="0 0 100 100"><polyline points="18,22 42,14 68,28 35,55 72,68" fill="none" stroke-width="1.5"/></svg><i class="star"></i><i class="star"></i><i class="star"></i><i class="star"></i><i class="star"></i></div><div class="motion-note">Loading D: Drive... mhm mhm</div>`; }
+    function content(t) {
+      if (screen === "boot") return boot();
+      if (screen === "home") return `<div class="title">HOME</div>${rows(t.rows,1)}`;
+      if (screen === "library") return `<div class="title">LOCAL LIBRARY</div>${rows(t.lib,0)}`;
+      if (screen === "settings") return `<div class="title">SETTINGS</div>${rows(t.set,0)}`;
+      if (screen === "now" && t.id === "archive") return `<div class="title">SIGNAL MONITOR</div><pre class="now-art">+----------------+
+| SHAeR ARCHIVE |
+|  WAV 44.1kHz  |
+|  [####----]   |
++----------------+</pre><h2 class="track">CLOUD SONG</h2><p class="artist">Local Archive</p><div class="progress"><div class="fill"></div></div>`;
+      if (screen === "now") return `<div class="title">NOW PLAYING</div><h2 class="track">Cloud Song</h2><p class="artist">SHAeR Local Archive</p><div class="progress"><div class="fill"></div></div>`;
+      if (screen === "charging") return `<div class="title">CHARGING</div><div class="charge"><div class="cell"><span></span></div></div><p class="artist">warm craft mode · 87%</p>`;
+      if (screen === "sleep") return `<div class="title">SLEEP</div><div class="sleep-mark">AOD</div><p class="artist">auto shutdown after 45 min idle</p>`;
+      const label = screen === "spotify" ? "Spotify slipped" : screen === "wifi" ? "WiFi wandered off" : "Headphones disconnected";
+      return `<div class="title">POPUP</div><div class="popup"><h2 class="track">${label}</h2><p class="artist">${screen === "bluetooth" ? "Trying automatic reconnect." : "Playback stopped. OK opens Local Library."}</p></div>`;
+    }
+    function render() {
+      grid.innerHTML = "";
+      for (const t of themes) {
+        const node = tpl.content.cloneNode(true);
+        const device = node.querySelector(".device");
+        const card = node.querySelector(".theme-card");
+        device.classList.add(t.id);
+        if (saver) device.classList.add("battery-saver");
+        node.querySelector(".mode").textContent = screen.toUpperCase();
+        node.querySelector(".signal").textContent = screen.includes("popup") ? "RECOVER" : "READY";
+        node.querySelector(".content").innerHTML = content(t);
+        node.querySelector(".motion-note").textContent = t.motion;
+        node.querySelector(".stamp").textContent = timeStamp();
+        node.querySelector(".battery").textContent = saver ? "BAT 41%" : "BAT 87%";
+        node.querySelector(".caption").innerHTML = `<strong>${t.name}</strong>${t.motion}`;
+        grid.appendChild(card);
+      }
+    }
+    document.querySelectorAll("[data-screen]").forEach(b => b.addEventListener("click", () => { document.querySelectorAll("[data-screen]").forEach(x=>x.classList.remove("active")); b.classList.add("active"); screen = b.dataset.screen; render(); }));
+    document.getElementById("power").addEventListener("click", () => { saver = !saver; document.getElementById("power").classList.toggle("active", saver); render(); });
+    render(); setInterval(render, 30000);
+  </script>
+</body>
+</html>

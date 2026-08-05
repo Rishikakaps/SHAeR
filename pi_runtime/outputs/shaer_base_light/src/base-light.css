@@ -1,0 +1,9 @@
+body[data-base-theme="light"] {
+  --base-bg: #f5f4ef;
+  --base-panel: #ffffff;
+  --base-text: #141414;
+  --base-muted: #626262;
+  --base-line: #c9c6bd;
+  --base-focus: #111111;
+  --base-fill: #e7e4dc;
+}

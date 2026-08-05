@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SHAeR Base Dark</title>
+  <link rel="stylesheet" href="src/base-theme.css?v=20260729">
+  <link rel="stylesheet" href="../shaer_pi_os/system-overlays.css?v=20260730a">
+</head>
+<body data-base-theme="dark">
+  <main class="workspace">
+    <section class="live-area" aria-label="Interactive Base Dark renderer">
+      <article class="device">
+        <div id="liveScreen" class="live-screen"></div>
+      </article>
+      <nav class="screen-picker" id="screenPicker" aria-label="Base Dark screens"></nav>
+    </section>
+  </main>
+
+  <template id="homeTemplate">
+    <article class="screen base-screen screen-home" data-name="home">
+      <header class="chrome"><b>Home</b><span data-clock>--:--</span></header>
+      <section class="base-panel">
+        <p class="kicker">SHAeR</p>
+        <h1>Choose</h1>
+        <div class="menu-list" data-menu="home">
+          <p>Local</p>
+          <p>Spotify</p>
+          <p>Memos</p>
+          <p>Settings</p>
+        </div>
+        <i class="position-indicator"><span style="height:100%"></span></i>
+      </section>
+      <footer class="status"><span data-date>--</span><b data-battery>--%</b></footer>
+    </article>
+  </template>
+
+  <template id="loadingTemplate">
+    <article class="screen base-screen screen-loading" data-name="loading">
+      <header class="chrome"><b>Loading</b><span data-clock>--:--</span></header>
+      <section class="center-panel">
+        <p class="kicker">adi-vasi OS</p>
+        <h1>Loading</h1>
+        <div class="progress"><i data-loading-progress></i></div>
+        <small>Preparing SHAeR</small>
+      </section>
+      <footer class="status"><span data-date>--</span><b data-battery>--%</b></footer>
+    </article>
+  </template>
+
+  <template id="libraryTemplate">
+    <article class="screen base-screen screen-library" data-name="library">
+      <header class="chrome"><b>Library</b><span data-clock>--:--</span></header>
+      <section class="base-panel">
+        <p class="kicker">Music</p>
+        <h1>Library</h1>
+        <div class="menu-list" data-music-list></div>
+        <i class="position-indicator" data-scroll-indicator><span></span></i>
+      </section>
+      <footer class="status"><span data-date>--</span><b data-battery>--%</b></footer>
+    </article>
+  </template>
+
+  <template id="tracksTemplate">
+    <article class="screen base-screen screen-tracks" data-name="tracks">
+      <header class="chrome"><b data-music-heading>Tracks</b><span data-clock>--:--</span></header>
+      <section class="base-panel">
+        <p class="kicker">Playlist</p>
+        <h1 data-short-heading>Tracks</h1>
+        <div class="menu-list" data-track-list></div>
+        <i class="position-indicator" data-scroll-indicator><span></span></i>
+      </section>
+      <footer class="status"><span data-date>--</span><b data-battery>--%</b></footer>
+    </article>
+  </template>
+
+  <template id="playingTemplate">
+    <article class="screen base-screen screen-playing" data-name="now-playing">
+      <header class="chrome"><b>Playing</b><span data-clock>--:--</span></header>
+      <section class="now-card">
+        <div class="cover" data-shaer-cover></div>
+        <div class="metadata">
+          <strong data-shaer-title>Nothing playing</strong>
+          <span data-shaer-artist>Choose music</span>
+          <small data-shaer-album></small>
+        </div>
+        <div class="time-row"><span data-shaer-elapsed>0:00</span><b data-shaer-duration>0:00</b></div>
+        <div class="progress"><i data-shaer-progress></i></div>
+        <div class="control-row">
+          <span>Prev</span><span>Play</span><span>Next</span>
+        </div>
+      </section>
+      <footer class="status"><span data-date>--</span><b data-battery>--%</b></footer>
+    </article>
+  </template>
+
+  <template id="memosTemplate">
+    <article class="screen base-screen screen-memos" data-name="memos">
+      <header class="chrome"><b>Memos</b><span data-clock>--:--</span></header>
+      <section class="base-panel">
+        <p class="kicker">Marginalia</p>
+        <h1>Voice</h1>
+        <div class="shaer-recording-runtime">
+          <strong data-recording-state>Ready</strong>
+          <span data-recording-time>0:00</span>
+          <small data-recording-storage>Storage pending</small>
+        </div>
+        <div class="menu-list compact">
+          <p>Archive</p>
+          <p>Record</p>
+          <p>Done</p>
+        </div>
+      </section>
+      <footer class="status"><span data-date>--</span><b data-battery>--%</b></footer>
+    </article>
+  </template>
+
+  <template id="settingsTemplate">
+    <article class="screen base-screen screen-settings" data-name="settings">
+      <header class="chrome"><b>Settings</b><span data-clock>--:--</span></header>
+      <section class="base-panel">
+        <p class="kicker">Device</p>
+        <h1>Settings</h1>
+        <div class="menu-list" data-menu="settings">
+          <p>About</p>
+          <p>Appearance</p>
+          <p>Playback</p>
+          <p>Audio</p>
+          <p>Connectivity</p>
+          <p>Power</p>
+          <p>Date &amp; Time</p>
+          <p>Sync</p>
+          <p>Advanced</p>
+        </div>
+        <i class="position-indicator"><span style="height:44%"></span></i>
+      </section>
+      <footer class="status"><span data-date>--</span><b data-battery>--%</b></footer>
+    </article>
+  </template>
+
+  <template id="aboutTemplate">
+    <article class="screen base-screen screen-about" data-name="about">
+      <header class="chrome"><b>About</b><span data-clock>--:--</span></header>
+      <section class="base-panel">
+        <p class="kicker">SHAeR</p>
+        <h1>About</h1>
+        <div class="menu-list compact">
+          <p>OS 0.17</p>
+          <p>Theme Base</p>
+          <p>Battery --%</p>
+        </div>
+      </section>
+      <footer class="status"><span data-date>--</span><b data-battery>--%</b></footer>
+    </article>
+  </template>
+
+  <template id="chargingTemplate">
+    <article class="screen base-screen screen-charging" data-name="charging">
+      <header class="chrome"><b>Charging</b><span data-clock>--:--</span></header>
+      <section class="center-panel">
+        <p class="kicker">Power</p>
+        <h1 data-charge-label>--%</h1>
+        <div class="progress"><i data-charge-progress></i></div>
+        <small data-charge-state>Power state unavailable</small>
+      </section>
+      <footer class="status"><span data-date>--</span><b data-battery>--%</b></footer>
+    </article>
+  </template>
+
+  <script src="../shaer_pi_os/music-store.js?v=20260718"></script>
+  <script src="../shaer_pi_os/firmware-core.js?v=20260730d"></script>
+  <script src="src/base-theme.js?v=20260729"></script>
+  <script src="../shaer_pi_os/hardware-bridge.js?v=20260730a"></script>
+</body>
+</html>

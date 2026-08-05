@@ -312,6 +312,8 @@ body[data-shaer-theme="raga"] .shaer-marginalia-launch {
 
 .shaer-marginalia-page__meta {
   margin: 0;
+  height: 10px;
+  line-height: 10px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -683,14 +685,20 @@ body[data-shaer-theme="raga"] .shaer-marginalia-launch {
 .shaer-long-text {
   display: block;
   max-width: 100%;
+  min-width: 0;
   overflow: hidden;
-  text-overflow: clip;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .shaer-long-text > span,
 .shaer-long-text[data-shaer-title] {
-  animation: shaer-title-pan 8s linear infinite alternate;
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 body[data-shaer-theme="bombay"] #shaer-system-layer {
@@ -761,13 +769,9 @@ body[data-shaer-theme="raga"] #shaer-system-layer {
 @keyframes shaer-boot-progress { to { width: 100%; } }
 @keyframes shaer-constellation-draw { to { stroke-dashoffset: 0; } }
 @keyframes shaer-star-appear { to { opacity: 1; } }
-@keyframes shaer-title-pan { from { text-indent: 0; } to { text-indent: -22%; } }
-
 @media (prefers-reduced-motion: reduce) {
   .shaer-system-spinner,
-  .shaer-boot-line i,
-  .shaer-long-text > span,
-  .shaer-long-text[data-shaer-title] {
+  .shaer-boot-line i {
     animation: none;
   }
 }
@@ -805,19 +809,31 @@ body[data-shaer-validation="true"] .shaer-boot-line i {
 .shaer-recording-runtime b { justify-self: start; }
 .shaer-recording-runtime strong { justify-self: center; font-size: 11px; }
 .shaer-recording-runtime small { justify-self: end; font-size: 7px; }
+.shaer-recording-runtime b,
+.shaer-recording-runtime strong,
+.shaer-recording-runtime small {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 body[data-recording-state="recording"] .shaer-recording-runtime b { animation: shaer-record-pulse 900ms ease-in-out infinite; }
 
 body[data-shaer-theme="archive"] .shaer-recording-runtime { background: #00110c; color: #00df9b; border-style: dashed; font-family: monospace; }
 body[data-shaer-theme="bombay"] .shaer-recording-runtime { background: #ddd7c8; color: #111; border-color: #b84c5c; font-family: Georgia, serif; }
 body[data-shaer-theme="punk"] .shaer-recording-runtime {
-  left: 105px;
+  left: 35px;
   right: 18px;
   top: 31px;
   bottom: auto;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  padding: 2px 5px;
   background: #0a0a0c;
   color: #ed0060;
   border-color: #ed0060;
   font-family: monospace;
+  font-size: 6px;
 }
 body[data-shaer-theme="xp"] .shaer-recording-runtime { bottom: 33px; background: #ece9d8; color: #111; border-color: #666; box-shadow: inset 1px 1px #fff, inset -1px -1px #888; font-family: Tahoma, sans-serif; }
 body[data-shaer-theme="garden"] .shaer-recording-runtime { background: rgba(50, 67, 68, .62); color: #fff; border-color: rgba(255,255,255,.65); backdrop-filter: blur(8px); }

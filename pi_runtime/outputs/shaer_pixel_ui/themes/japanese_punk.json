@@ -1,0 +1,29 @@
+{
+  "id": "japanese_punk",
+  "display_name": "Japanese Punk",
+  "target_resolution": [240, 320],
+  "palette": {
+    "bg": "#111111",
+    "panel": "#1d1d1d",
+    "ink": "#f4efe8",
+    "muted": "#8e8e8e",
+    "accent": "#f20a66",
+    "accent_secondary": "#70f1d1",
+    "selection": "#f20a66"
+  },
+  "screens": {
+    "boot": ["neon_cut", "cassette_loader", "hard_flash_identity"],
+    "home": ["zine_rows", "sticker_selection"],
+    "library": ["cassette_list", "pink_selection_bar"],
+    "now_playing": ["mixtape_art", "neon_progress", "track_number_badge"],
+    "settings": ["zine_category_rows", "hard_edge_selection"],
+    "spotify_drop": ["warning_sticker_popup", "ok_opens_local_library"],
+    "charging": ["neon_battery_card"],
+    "sleep": ["unified_aod", "reduced_neon"]
+  },
+  "motion": {
+    "style": "hard_cut_sticker",
+    "max_animated_elements": 6,
+    "battery_saver_fps": 8
+  }
+}

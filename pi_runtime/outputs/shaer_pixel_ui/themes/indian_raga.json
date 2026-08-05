@@ -1,0 +1,29 @@
+{
+  "id": "indian_raga",
+  "display_name": "Indian Raga",
+  "target_resolution": [240, 320],
+  "palette": {
+    "bg": "#030126",
+    "panel": "#11073a",
+    "ink": "#ded4ff",
+    "muted": "#9d8ace",
+    "accent": "#8e3417",
+    "accent_secondary": "#c9a7ff",
+    "selection": "#8e3417"
+  },
+  "screens": {
+    "boot": ["indigo_curtain", "libra_constellation", "luminous_identity"],
+    "home": ["ornamental_frame", "raag_menu_rows"],
+    "library": ["raag_list", "lavender_text", "sienna_selection"],
+    "now_playing": ["tanpura_ring_art", "laya_progress", "soft_glow"],
+    "settings": ["ornamental_category_list", "sienna_selection"],
+    "spotify_drop": ["framed_popup", "ok_opens_local_library"],
+    "charging": ["diya_like_battery_glow"],
+    "sleep": ["unified_aod", "lavender_time"]
+  },
+  "motion": {
+    "style": "curtain_shimmer",
+    "max_animated_elements": 4,
+    "battery_saver_fps": 10
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "id": "archive_dark",
+  "display_name": "Archive Dark",
+  "target_resolution": [240, 320],
+  "palette": {
+    "bg": "#000000",
+    "panel": "#c0c0c0",
+    "ink": "#ffffff",
+    "muted": "#8c8c8c",
+    "accent": "#e63950",
+    "accent_secondary": "#4a90d9",
+    "selection": "#000080"
+  },
+  "screens": {
+    "boot": ["libra_constellation", "opening_d_drive", "identity_reveal"],
+    "home": ["win95_titlebar", "menu_bar", "bracketed_menu_rows", "status_footer"],
+    "library": ["explorer_rows", "duration_column", "selected_navy_row"],
+    "now_playing": ["win95_titlebar", "inset_art_or_vinyl", "block_progress", "bitrate_footer"],
+    "settings": ["category_list", "selected_navy_row", "status_footer"],
+    "spotify_drop": ["blocking_popup", "ok_opens_local_library"],
+    "charging": ["plugged_in_dialog", "block_battery_meter"],
+    "sleep": ["unified_aod", "red_time_digits"]
+  },
+  "motion": {
+    "style": "scanline_cursor",
+    "max_animated_elements": 4,
+    "battery_saver_fps": 12
+  }
+}
