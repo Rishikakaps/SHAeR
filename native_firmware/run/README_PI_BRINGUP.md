@@ -1,11 +1,11 @@
 # SHAeR Pi Bring-Up Run Notes
 
-Copy the `work/shaer` folder to the Raspberry Pi, for example as `/home/pi/shaer`.
+Copy the SHAeR native firmware folder to the Raspberry Pi, for example as `/opt/shaer-native` or another path you configure in `systemd/shaer-pi-bringup.service`.
 
 Build:
 
 ```bash
-cd /home/pi/shaer
+cd /opt/shaer-native
 make pi
 ```
 
@@ -31,4 +31,3 @@ journalctl -u shaer-pi-bringup -f
 ```
 
 For tonight, manual run is safer than enabling startup immediately.
-

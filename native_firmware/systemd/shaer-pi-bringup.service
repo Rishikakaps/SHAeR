@@ -4,11 +4,10 @@ After=multi-user.target sound.target bluetooth.target
 
 [Service]
 Type=simple
-WorkingDirectory=/home/pi/shaer
-ExecStart=/home/pi/shaer/build/shaer_pi_bringup
+WorkingDirectory=/opt/shaer-native
+ExecStart=/opt/shaer-native/build/shaer_pi_bringup
 Restart=on-failure
 RestartSec=2
 
 [Install]
 WantedBy=multi-user.target
-

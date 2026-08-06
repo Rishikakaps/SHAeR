@@ -74,7 +74,7 @@ HTML = """<!doctype html>
     <main>
       <section id="dashboard" class="section active">
         <div class="grid" id="stats"></div>
-        <div class="card"><h2>Quick Import</h2><label>Music folder</label><input id="importPath" placeholder="/Users/rishika/Music"><button class="primary" onclick="importMusic()">Import Music</button></div>
+        <div class="card"><h2>Quick Import</h2><label>Music folder</label><input id="importPath" placeholder="~/Music"><button class="primary" onclick="importMusic()">Import Music</button></div>
       </section>
       <section id="library" class="section"><div class="card"><h2>Library Manager</h2><table><thead><tr><th>Title</th><th>Artist</th><th>Album</th><th>Format</th><th>Year</th><th>Metadata</th></tr></thead><tbody id="tracks"></tbody></table></div><div class="card"><h2>Metadata Viewer</h2><pre id="metadata">Select a track.</pre></div></section>
       <section id="playlists" class="section"><div class="card"><h2>Playlist Editor</h2><div class="two"><div><label>Playlist name</label><input id="playlistName" placeholder="Road Trip"></div><div><label>Track hashes, one per line</label><textarea id="playlistTracks" rows="4"></textarea></div></div><button class="primary" onclick="savePlaylist()">Save Playlist</button></div><div class="card" id="playlistList"></div></section>
