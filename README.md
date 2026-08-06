@@ -5,10 +5,10 @@ This is the canonical SHAeR handoff workspace assembled from the two Codex build
 - `native_firmware/`: the 26 June C++ foreground firmware, HAL, simulator, native renderer, local library/settings foundation, tests, hardware docs, and Raspberry Pi build/install scripts.
 - `pi_runtime/`: the 4-13 July Python/browser Raspberry Pi runtime, six finished theme worlds, shared UI state machine, Spotify Connect, companion app, voice archive, security hardening, theme validation, and deployable Pi bundle.
 
-Start all future SHAeR work from this directory:
+Start future SHAeR work from the repository checkout you cloned:
 
 ```bash
-cd /Users/rishika/Documents/Codex/2026-07-04/co/shaer_unified
+cd SHAeR
 ```
 
 Read these before editing:

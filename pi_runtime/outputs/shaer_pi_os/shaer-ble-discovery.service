@@ -5,8 +5,9 @@ Wants=bluetooth.service network-online.target
 
 [Service]
 Type=simple
-User=aditya
-ExecStart=/usr/bin/python3 /home/aditya/shaer/outputs/shaer_pi_os/shaer_ble_discovery.py --port 8775
+User=shaer
+EnvironmentFile=-/etc/shaer/shaer.env
+ExecStart=/usr/bin/python3 /opt/shaer/outputs/shaer_pi_os/shaer_ble_discovery.py --port ${SHAER_PORT}
 Restart=always
 RestartSec=3
 

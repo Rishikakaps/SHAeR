@@ -42,7 +42,7 @@ The Android-only code is limited to Android Keystore credential storage and NSD/
 On SHAeR:
 
 ```bash
-cd /home/aditya/shaer/outputs
+cd "${SHAER_OUTPUTS_DIR:-/opt/shaer/outputs}"
 python3 shaer_pi_os/server.py --host 0.0.0.0 --port 8775 --theme auto
 ```
 

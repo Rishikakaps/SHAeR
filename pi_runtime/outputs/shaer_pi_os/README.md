@@ -30,7 +30,7 @@ cd ~/shaer/outputs
 
 Build the archive from the repository root with `bash build_pi_bundle.sh`. The builder excludes AppleDouble files, `.DS_Store`, caches, validation artifacts, and pending restore files, then prints the SHA-256 checksum.
 
-Start the default Dark Archive theme:
+Start the default Dark Archive theme in hardware mode only after wiring is ready:
 
 ```bash
 python3 shaer_pi_os/server.py --host 0.0.0.0 --port 8775 --theme shaer_dark_archive --gpio
@@ -83,6 +83,36 @@ curl -X POST -H 'Content-Type: application/json' -d '{"action":"back"}' http://1
 ```
 
 The browser bridge converts those events into the same keyboard controls the themes already use. This endpoint is disabled unless `--allow-test-input` is supplied and rejects non-loopback clients.
+
+## Repeatable Bookworm Bootstrap
+
+The clean installer is `shaer_pi_os/bootstrap_bookworm.sh`. Its safe first-boot path is mock-hardware mode, which starts the same application logic without GPIO, display, audio, Bluetooth discovery, or power actions:
+
+```bash
+sudo ./shaer_pi_os/bootstrap_bookworm.sh --mock-hardware --enable-service
+```
+
+Override the runtime identity and install path with flags instead of editing service files:
+
+```bash
+sudo ./shaer_pi_os/bootstrap_bookworm.sh --mock-hardware --user shaer --install-dir /opt/shaer --enable-service
+```
+
+For static laptop verification of the rendered commands and service files:
+
+```bash
+./shaer_pi_os/bootstrap_bookworm.sh --dry-run --assume-bookworm --mock-hardware --skip-apt --install-dir /tmp/shaer --user "$USER" --systemd-dir /tmp/shaer-systemd
+```
+
+Useful maintenance commands:
+
+```bash
+./shaer_pi_os/health_check.sh
+./shaer_pi_os/diagnostics.sh
+./shaer_pi_os/logs.sh -f
+sudo ./shaer_pi_os/uninstall.sh
+sudo SHAER_INSTALL_DIR=/opt/shaer ./shaer_pi_os/rollback.sh /opt/shaer.previous
+```
 
 ## Layer 11 Backend Diagnostics
 
@@ -145,7 +175,7 @@ physical acceptance gates are documented in
 
 ## Optional System Service
 
-Edit `shaer_pi_os/shaer-pi-os.service` if your Pi user/path is not `/home/pi/shaer/outputs`, then install it:
+Prefer `bootstrap_bookworm.sh` for service installation. The checked-in service files now use portable defaults (`shaer` and `/opt/shaer/outputs`) and the bootstrap renders the exact configured user/path.
 
 ```bash
 sudo cp shaer_pi_os/shaer-pi-os.service /etc/systemd/system/shaer-pi-os.service

@@ -10,6 +10,7 @@ requires-python = ">=3.10"
 
 [project.optional-dependencies]
 test = ["pytest>=8.0"]
+qa = ["Pillow>=10.0"]
 
 [tool.setuptools]
 packages = ["shaer_music", "shaer_recording", "shaer_companion", "shaer_hal"]

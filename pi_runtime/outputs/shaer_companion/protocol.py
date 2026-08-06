@@ -28,6 +28,7 @@ PAIRING_TTL_S = 180
 MAX_JSON_FILE_BYTES = 64 * 1024 * 1024
 MAX_BACKUP_BYTES = 256 * 1024 * 1024
 MAX_ARCHIVE_EXPANDED_BYTES = 1024 * 1024 * 1024
+DEFAULT_CONFIG_DIR = Path(os.environ.get("SHAER_CONFIG_DIR", Path.home() / ".config" / "shaer"))
 MAX_ARCHIVE_MEMBERS = 10_000
 MAX_ARCHIVE_RATIO = 200
 MAX_PAIRING_SESSIONS = 3
@@ -131,7 +132,7 @@ DEFAULT_SETTINGS: dict[str, object] = {
     "bluetooth": {"device_name": "SHAeR", "pairing": True, "auto_connect": True, "codec": "auto"},
     "wifi": {"dhcp": True, "hostname": "shaer", "saved_networks": []},
     "power": {"auto_shutdown_min": 0, "low_battery_percent": 15, "charging_behavior": "normal"},
-    "library": {"scan_paths": ["/home/aditya/.config/shaer/music"], "automatic_rescan": True, "artwork_cache_mb": 256},
+    "library": {"scan_paths": [str(Path(os.environ.get("SHAER_MUSIC_DIR", DEFAULT_CONFIG_DIR / "music")))], "automatic_rescan": True, "artwork_cache_mb": 256},
     "spotify": {"device_name": "SHAeR"},
     "privacy": {"listening_history": True, "analytics": False},
     "developer": {"ssh": False, "logging_level": "info", "debug_overlays": False},

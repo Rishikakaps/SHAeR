@@ -301,6 +301,7 @@ async function main() {
   mkdirSync(baselines, { recursive: true });
 
   let server = null;
+  let browser = null;
   try {
     if (!config.staticMode) {
       try {
@@ -312,7 +313,7 @@ async function main() {
     }
 
     const systemChrome = process.env.CHROME_PATH || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
-    const browser = await chromium.launch({
+    browser = await chromium.launch({
       headless: true,
       ...(existsSync(systemChrome) ? { executablePath: systemChrome } : {})
     });
@@ -394,14 +395,15 @@ async function main() {
         }
       }
     }
-
     await browser.close();
+    browser = null;
     writeFileSync(join(artifacts, "report.json"), JSON.stringify(report, null, 2));
     const failed = report.summary.errors || report.summary.baselineMismatches || consoleErrors.length;
     console.log(JSON.stringify(report.summary));
     console.log(`Report: ${join(artifacts, "report.json")}`);
     if (failed) process.exitCode = 1;
   } finally {
+    if (browser) await browser.close();
     if (server && !config.keepServer) server.kill("SIGTERM");
   }
 }

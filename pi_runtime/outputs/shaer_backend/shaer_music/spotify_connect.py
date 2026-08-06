@@ -110,7 +110,12 @@ class LibrespotManager:
         self.client.transfer(str(device["id"]), play=play)
 
     @staticmethod
-    def service_unit(librespot_path: str = "/usr/local/bin/librespot") -> str:
+    def service_unit(
+        librespot_path: str = "/usr/local/bin/librespot",
+        runtime_user: str = "shaer",
+        config_dir: str = "/etc/shaer",
+        cache_dir: str = "/var/cache/shaer",
+    ) -> str:
         return f"""[Unit]
 Description=SHAeR Spotify Connect receiver
 After=network-online.target sound.target
@@ -118,9 +123,9 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-User=aditya
-EnvironmentFile=-/home/aditya/.config/shaer/spotify.env
-ExecStart={librespot_path} --name SHAeR --backend alsa --device ${{SHAER_ALSA_DEVICE}} --cache /home/aditya/.cache/shaer/librespot --bitrate 320
+User={runtime_user}
+EnvironmentFile=-{config_dir}/spotify.env
+ExecStart={librespot_path} --name SHAeR --backend alsa --device ${{SHAER_ALSA_DEVICE}} --cache {cache_dir}/librespot --bitrate 320
 Restart=always
 RestartSec=3
 NoNewPrivileges=true
