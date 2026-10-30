@@ -13,6 +13,10 @@ This repository is the GitHub-ready SHAeR source tree. It includes:
 - Documentation, build guides, and verification notes
 - A download page for phone and desktop installers
 
+## Design portfolio
+
+[Browse the interface, theme and packaging designs](design/README.md), including Figma source links and a packaging source backup. Hardware validation remains pending.
+
 ## For Adi
 
 Start here for the short product story: how SHAeR moved from hardware idea to Pi runtime, phone companion, desktop companion, UI direction, and release flow.
